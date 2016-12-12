@@ -1,0 +1,71 @@
+.navbar-foot{
+    border: 0.5px solid #DADADB;
+    background: #FFFFFF;
+    max-width: 560px;
+    margin: 0 auto;
+}
+.table-bar > tbody > tr > td{
+  font-size:12px;
+  vertical-align: middle;
+  text-align:center;
+}
+.table-bar {
+  width: 100%;
+  max-width: 100%;
+  height:45px;
+  border-color: #b5b5b6;
+  background-color: #FFFFFF;
+  img{width: 14px;}
+  a{
+    width: 100%;
+    line-height: 30px;
+    display: inline-block;
+    color: #B5B5B6;
+  }
+  a:hover{
+    color: #B5B5B6;
+  }
+  .bar-ico{
+    background-repeat: no-repeat;
+    background-size: 15px 15px;
+    background-position-x: 50%;
+    background-position-y: 20%;
+  }
+  .bar-my-order{
+    border-right: 0.5px solid #DFDFDF;
+    border-left: 0.5px solid #DFDFDF;
+  }
+  .icobar-font{
+    margin-top: 10px;
+    display: inline-block;
+    height: 20px;
+  }
+}
+.bar-group{
+  background-image: url(https://img.91pintuan.com/home/ymyimg/dibar1.png);
+}
+.bar-my-order{
+  background-image: url(https://img.91pintuan.com/home/ymyimg/dibar2.png);
+}
+.bar-more{
+  background-image: url(https://img.91pintuan.com/home/ymyimg/dibar3.png);
+}
+
+.bar-group.active{
+  background-image: url(https://img.91pintuan.com/home/ymyimg/dibarred1.png);
+  .icobar-font{
+    color: #f23838;
+  }
+}
+.bar-my-order.active{
+  background-image: url(https://img.91pintuan.com/home/ymyimg/dibarred2.png);
+  .icobar-font{
+    color: #f23838;
+  }
+}
+.bar-more.active{
+  background-image: url(https://img.91pintuan.com/home/ymyimg/dibarred3.png);
+  .icobar-font{
+    color: #f23838;
+  }
+}

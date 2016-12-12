@@ -1,0 +1,125 @@
+<group-list if="{opts.$show}">
+	<div class="fenlei" if="{opts.filterGrp !== 'my'}">
+		<!--{opts.route}-->
+		<a class="gaa" href="/group/list?id={commId}">
+	    <span class="gleft {active: opts.route === '/group/list'}">大家的团</span>
+		</a>
+
+		<span class="gang">|</span>
+		<a class="gaa" href="/group/miss?id={commId}">
+		  <span class="gright {active: opts.route === '/group/miss'}">看看哪些团还缺人</span>
+		</a>
+	</div>
+
+	<div if="{opts.filterGrp === 'all'}" class="group-count">
+		<p class="grouplist1">该商品共发起拼团数为</p>
+		<p class="grouplist2"><span class="grouplist3">{opts.groups.count}</span>个团</p>
+	</div>
+
+	<div class="grouplist4">
+		<on-scroll
+			infinite-scroll='{opts.nextPage}'
+			infinite-scroll-disabled='{opts.groups.busy}'
+			infinite-scroll-distance='{100}'
+			infinite-scroll-listen-for-event='{groups.filter}'
+		>
+			<div class="list" each="{group in parent.opts.groups.items}" no-reorder>
+				<a href="/group/{group.id}" target-for-android>
+					<div class="grouplist5">
+						<div class="list-head" >
+							<p class="end"  if="{!group.isBefore}">已结束</p>
+							<p class="grouplist6" if="{group.isBefore}">
+								<span>剩余时间:</span><span>{ $.util.filter.ago(group.time_end) }</span>
+							</p>
+							<p class="grouplist7" if="{group.commodity.model === 'ladder' && group.isBefore}">
+								{group.num_order}人已参团(阶梯团)
+							</p>
+							<p class="grouplist7" if="{group.commodity.model !== 'ladder'&&group.isBefore}">
+								{group.commodity.partakers>group.num_order?'还差'+(group.commodity.partakers-group.num_order)+'人成团':'已成团'}
+							</p>
+						</div>
+
+						<div class="media-list">
+							<div class="media-left">
+								<img-lazy-loader  height="{85}" width="{120}" 
+									holder="svg:holder.js/100px186?theme=gray&text=91拼团" 
+									src="{app.config.phtUri + group.commodity.cover + app.config.phtStlList4 }" 
+									class="img-responsive" alt="{group.commodity.name}"></img-lazy-loader>
+							</div>
+
+							<div class="media-body1">
+								<p class="media-heading1">
+									{group.commodity.name}
+								</p>
+								<div class="grouplist9">团长：{group.address.name}</div>
+								<div>
+									开团时间:{$.util.filter.date(new Date(group.time.add), 'yyyy-MM-dd hh:mm')}
+								</div>
+									
+								<div if="{groups.params.my === 'post'}" >
+									开团时间:{$.util.filter.date(new Date(group.time.add), 'yyyy-MM-dd hh:mm')}
+								</div>
+								<div if="{groups.params.my !== 'post'}" >
+									开团时间:{$.util.filter.date(new Date(group.time.add), 'yyyy-MM-dd hh:mm')}
+								</div>
+							</div>
+						</div>
+					</div>
+				</a>
+			</div>
+		</on-scroll>
+	</div>
+
+	<script>
+		import {connect} from 'ninjiajs';
+		import actions from './group.actions';
+		import Cookies from '../../framework/cookie';
+		this.mixin('router');
+		const isShow = views => {
+			if(this.$routePath){
+				return views[this.$routePath]
+			}
+			return false;
+		}
+		connect(
+			state => ({
+				groups: state.groups,
+				filterGrp: state.groupsFilter,
+				route: state.route.$state,
+				$show: isShow(state.route.$views) || false
+				// $show: (state.route.$views['/group/miss'] || state.route.$views['/group/list']) || false
+			}),
+			dispatch => ({
+				nextPage: () => dispatch(actions.nextPage()),
+				changeTitle: title => dispatch({type: 'changeTitle', payload: title}),
+				setFilter: filter => dispatch({type: 'setGroupsFilter', payload: filter}),
+				initGroups: json => dispatch(actions.initGroups(json))
+			})
+		)(this);
+
+		this.$use(function(next, ctx){
+			this.opts.changeTitle('拼团列表');
+			this.opts.setFilter('all');
+			var params = {};
+			if(ctx.req.query.id){
+				this.commId = ctx.req.query.id;
+				Cookies.set('commId', ctx.req.query.id);
+				params = {commodity: ctx.req.query.id}
+			}
+			if(ctx.req.query.my){
+				params = {my: ctx.req.query.my}
+				this.opts.setFilter('my');
+			}
+			if(ctx.req.query.filter) {
+				params.filter = ctx.req.query.filter;
+			};
+			if(app.store.getState().route.$state === '/group/miss'){
+				params.filter = 'missing';
+				this.opts.setFilter('missing');
+			}
+			this.opts.initGroups({params: params});
+			this.opts.nextPage();
+			next();
+		})
+	</script>
+</group-list>

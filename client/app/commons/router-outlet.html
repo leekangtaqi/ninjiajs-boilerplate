@@ -1,0 +1,31 @@
+<router-outlet>
+	<div data-tag-name="{ route.component.displayName }" each="{ route in distinct(routes) }">
+	</div>
+	<script>
+		this.$isMounted = false;
+		this.on('mount', () => {
+			this.routes = [];
+			if(!app.hub.state.hint){
+				this.routes = app.hub.routes.children;
+			}else{
+				let outletId = app.hub.refinedRoutes.filter(r => r.path === app.hub.state.hint)[0];
+				this.routes = app.hub.refinedRoutes.filter(r => r.id === outletId.id)[0].children;
+			}	
+			this.update();
+			this.trigger('$mounted');
+			this.$isMounted = true;
+		})
+		this.distinct = function(routes) {
+			var res = [];
+			if(routes){
+				for(var i=0, len=routes.length; i<len; i++){
+					var route = routes[i];				
+					if(res.filter(r => r.component.displayName === route.component.displayName).length <= 0){
+						res.push(route);
+					}
+				}
+			}
+			return res;
+		}
+	</script>
+</router-outlet>

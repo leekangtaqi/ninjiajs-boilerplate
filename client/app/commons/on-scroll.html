@@ -1,0 +1,62 @@
+<on-scroll>
+	<yield/>
+	<script>
+		const getItems = () => this.opts.infiniteScrollIdentify.split('.').reduce((o, field) => o[field], this.parent.opts)
+		this.parent.on('entered', () => {
+			if(this.opts.infiniteScrollIdentify){
+				this.parent.on('updated', this.onUpdated);
+				let items = getItems();
+				this.items = items;
+			}
+			this.doCheck();
+			window.addEventListener('scroll', this.onScrollHandler);
+			window.addEventListener('resize', this.onScrollHandler);
+		});
+
+		this.parent.on('before-leave', () => {
+			this.parent.off('updated', this.onUpdated);
+			window.removeEventListener('scroll', this.onScrollHandler);
+			window.removeEventListener('resize', this.onScrollHandler);
+		});
+
+		this.onUpdated = () => {
+			if(this.items && this.opts.infiniteScrollIdentify){
+				let identify = this.opts.infiniteScrollIdentify;
+				let newItems = getItems();
+				if(this.items && newItems){
+					if(newItems != this.items){
+						$.util.throttle(() => {
+							this.doCheck();
+						}, 50)
+						this.items = newItems;
+					}
+				}
+			}
+		}
+
+		this.onScrollHandler = e => $.util.throttle(() => {
+			this.doCheck();
+		}, 10);
+
+		this.isBottom = () => {
+			return (window.innerHeight + window.scrollY) + (this.opts.infiniteScrollDistance || 0) >= document.body.scrollHeight
+		};
+		
+		this.doCheck = () => {
+			setTimeout(() => {
+				if(this.isBottom() && !(!!this.opts.infiniteScrollDisabled)){
+					this.opts.infiniteScroll();
+				}
+			}, 0)
+		}
+		// this.on('mount', () => {
+		// this.opts.infiniteScroll();
+		// 	window.addEventListener('scroll', this.onScrollHandler);
+		// 	window.addEventListener('resize', this.onScrollHandler);
+		// })
+		// this.on('unmount', () => {
+		// 	window.removeEventListener('scroll', this.onScrollHandler);
+		// 	window.removeEventListener('resize', this.onScrollHandler);
+		// })
+	</script>
+</on-scroll>

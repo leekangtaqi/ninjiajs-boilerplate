@@ -1,0 +1,24 @@
+<icobar class="navbar-fixed-bottom navbar-foot" show="{true}"> <!-- hideBar? navbar-inverse--> 
+	<table class="table-bar">
+    <tr>
+      <td style="width: 33.33%;" class="{active: opts.$state === '/'} bar-ico bar-group">
+        <a href="/"><span class="icobar-font">火爆拼团</span></a>
+      </td>
+      <td style="width: 33.33%;" class="{active: opts.$state === '/order/list'} bar-ico bar-my-order">
+        <a href="/order/list"  ui-sref="order.list"><span class="icobar-font">我的订单</span></a>
+      </td>
+      <td style="width: 33.33%;" class="{active: opts.$state === '/help/more'} bar-ico bar-more">
+        <a href="/help/more" ui-sref="help.more"><span class="icobar-font">更多</span></a>
+      </td>
+    </tr>
+  </table>
+	<script>
+		'use strict';
+		import {connect} from 'ninjiajs';
+		connect(
+			state=>({
+				$state: state.route.$state
+			})
+		)(this);
+	</script>
+</icobar>

@@ -1,0 +1,393 @@
+<group-info-join>
+	<div>
+		<!--【多场景模式】-->
+		<div if="{opts.group.commodity.scene === 'poi_logi' || opts.group.commodity.scene === 'poi_coll' }" class="more-select">
+			<label onclick="{onClickSelectScene}" class="{'bg-color' : opts.group.selectScene === 'poi'}" value="poi"  if="{opts.group.commodity.status.poi}">
+				<span class="img-icon icon1"></span>门店自提
+			</label>
+			<label onclick="{onClickSelectScene}" class="{'bg-color' : opts.group.selectScene === 'logistics'}" value="logistics"  if="{opts.group.commodity.scene === 'poi_logi' && opts.group.commodity.status.logistics}">
+				<span class="img-icon icon2"></span>快递配送
+			</label>
+			<label onclick="{onClickSelectScene}" class="{'bg-color' : opts.group.selectScene === 'collection'}" value="collection"  if="{opts.group.commodity.scene === 'poi_coll' && opts.group.commodity.status.collection}">团长代收
+			</label>
+		</div>
+		<!--【单场景模式】-->
+		<div if="{opts.group.commodity.scene !== 'poi_logi' && opts.group.commodity.scene !== 'poi_coll' }" class="one-select">
+			<label value="poi" if="{opts.group.commodity.scene === 'poi'}">
+				<img class="img-icon" src="https://img.91pintuan.com/poi.png"/>
+				<span>门店自提</span>
+			</label>
+			<label value="logistics"  if="{opts.group.commodity.scene === 'logistics'}">
+				<img class="img-icon" src="https://img.91pintuan.com/logistic.png"/>
+				<span>快递配送</span>
+			</label>
+			<label value="collection" if="{opts.group.commodity.scene === 'collection'}">
+				<span>团长代收</span>
+			</label>
+			<label value="virtual" if="{opts.group.commodity.scene === 'virtual'}">
+				<img class="img-icon" src="https://img.91pintuan.com/code.png"/>
+				<span>虚拟商品</span>
+			</label>
+		</div>	
+				
+		<form class="form-horizontal address_form" name="joinForm" novalidate>
+			<div class="form-grey"></div>
+			<!--姓名-->
+			<div class="form-group bgcolor-white" 
+				 class="{'has-error' : forms['joinForm'].name.$invalid && opts.stateView.submitted}">
+				<label class="col-xs-3 control-label">姓名</label>
+				<div class="col-xs-9">
+					<input value="{opts.address.name}" type="text" name="name" class="form-control noborder" 
+						   placeholder="{forms['joinForm'].name.$error.required && submitted?'姓名必须填写':''}" 
+						   onchange="{onChangeName}" minlength="2" maxlength="20" required />
+					<p if="{forms['joinForm'].name.$error.minlength}" class="help-block">姓名字数太少.</p>
+					<p if="{forms['joinForm'].name.$error.maxlength}" class="help-block">姓名字数太多.</p>
+				</div>
+			</div>
+			<!--手机号-->
+			<div class="form-group bgcolor-white" 
+				 class="{'has-error' : forms['joinForm'].telephone.$invalid && opts.stateView.submitted}">
+				<label class="col-xs-3 control-label">手机号</label>
+				<div class="col-xs-9">
+				<input value="{opts.address.telephone}" type="telephone" name="telephone" class="form-control noborder"
+					   placeholder="{forms['joinForm'].telephone.$error.required && opts.stateView.submitted?'手机号必须填写':''}" 
+					   oninput="{onChangeTelephone}"  minlength="6" maxlength="20" required>
+				<p if="{forms['joinForm'].telephone.$error.minlength}" class="help-block">电话最少6位.</p>
+				<p if="{forms['joinForm'].telephone.$error.maxlength}" class="help-block">电话最多20位.</p>
+				</div>
+			</div>
+			<!-- 物流配送 -->
+			<div if="{opts.group.selectScene === 'logistics' || opts.group.commodity.scene === 'logistics'}">
+				<!--选择省-->
+				<div class="form-group bgcolor-white"
+					class="{'has-error' : forms['joinForm'].province.$invalid && opts.stateView.submitted}">
+					<label class="col-xs-3 control-label">所在省</label>
+					<div class="col-xs-3" id="province-width">
+						<select 
+							name="province" 
+							class="form-control form-select" 
+							required 
+							onchange="{onSelectJoinGroupProvince}">
+							<option value="">选择省</option>
+							<option selected="{parent.opts.address.province.id == province.id}" value="{JSON.stringify(province)}" each="{province in opts.provinces}">{province.name}</option>
+						</select>
+						<p if="{forms['joinForm'].province.$error.required}" class="help-block">请选择省份.</p>
+					</div>
+					<div class="col-xs-1" id="province-down">
+						<img src="https://img.91pintuan.com/down.png" alt="" />
+					</div>
+				</div>
+				<!--选择市-->
+				<div class="form-group bgcolor-white"
+					class="{'has-error' : forms['joinForm'].city.$invalid && opts.stateView.submitted}">
+					<label class="col-xs-3 control-label">所在市</label>
+					<div class="col-xs-3" id="province-width">
+						<select 
+							name="city" 
+							class="form-control form-select" 
+							onchange="{onSelectJoinGroupCity}" required >
+							<option value="">选择市</option>
+							<option selected="{parent.opts.address.city.id == city.id}" value="{JSON.stringify(city)}" each="{city in opts.cities}">{city.name}</option>
+						</select>
+						<p if="{forms['joinForm'].city.$error.required}" class="help-block">请选择城市.</p>
+					</div>
+					<div class="col-xs-1" id="province-down">
+						<img src="https://img.91pintuan.com/down.png" alt="" />
+					</div>
+				</div>
+				<!--区县-->
+				<div class="form-group bgcolor-white"
+					class="{'has-error' : forms['joinForm'].district.$invalid && opts.stateView.submitted}">
+					<label class="col-xs-3 control-label">区&nbsp;/&nbsp;县</label>
+					<div class="col-xs-3" id="province-width">
+						<select 
+							name="district" 
+							class="form-control form-select" 
+							onchange="{onSelectJoinGroupDistrict}"
+							required
+							>
+							<option value="">区县</option>
+								<option value="{JSON.stringify(district)}"
+									selected="{parent.opts.address.district.id == district.id}"
+									each="{district in (opts.area.city.districts || opts.area.city.district)}">{district.name}
+								</option>
+						</select>
+						<p if="{forms['joinForm'].district.$error.required}" class="help-block">请选择区县.</p>
+					</div>
+					<div class="col-xs-1" id="province-down">
+						<img src="https://img.91pintuan.com/down.png" alt="" />
+					</div>
+				</div>
+				<!--详细地址-->
+				<div class="form-group bgcolor-white" 
+					class="{ 'has-error' : forms['joinForm'].address.$invalid && opts.stateView.submitted}" >
+					<label class="col-xs-3 control-label">详细地址</label>
+					<div class="col-xs-9">
+					<input 
+						value="{opts.address.address}"
+						type="text" onchange="{onChangeAddress}" name="address" 
+						class="form-control noborder" 
+						placeholder="{forms['joinForm'].address.$error.required && opts.stateView.submitted?'请填写收获地址':''}" 
+						maxlength="255" required>
+					<p if="{forms['joinForm'].address.$error.required}" class="help-block">请填写详细地址.</p>
+					<p if="{forms['joinForm'].address.$error.maxlength}" class="help-block">收货地址字数太多.</p>
+					</div>
+				</div>
+				<!--配送邮费-->
+				<!--【分享团】share-->
+				<div if="{opts.group.commodity.status.model === 'share'}">
+					<div class="form-group bgcolor-white" if="{opts.deliveryPayment}">
+						<label class="col-xs-3 control-label">配送邮费</label>
+						<div class="col-xs-9">
+							<input type="hidden" name="postage" 
+								class="form-control noborder form-font" 
+								value="{opts.deliveryPayment}"
+								required>
+							<span>{$.util.filter.currency(opts.deliveryPayment)}</span>
+						</div>
+					</div>
+				</div>
+				<!--【佣金团】distribution-->
+				<div if="{opts.group.commodity.status.model === 'distribution'}">
+					<div class="form-group bgcolor-white" if="{opts.deliveryPayment}">
+						<label class="col-xs-3 control-label">配送邮费</label>
+						<div class="col-xs-9">
+							<input type="hidden" name="postage" 
+								class="form-control noborder form-font" 
+								value="{opts.deliveryPayment}"
+								required>
+							<span>{$.util.filter.currency(opts.deliveryPayment)}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!--门店自提-->
+			<div if="{opts.group.selectScene === 'poi' || opts.group.commodity.scene === 'poi'}" 
+				 class="form-group bgcolor-white"
+				 class="{'has-error': forms['joinForm'].poi.$invalid && opts.stateView.submitted}"
+				 if="{opts.group.commodity.poitag && opts.group.commodity.poitag.length > 0}">
+				<label class="col-xs-3 control-label">自提门店</label>
+				<div class="col-xs-8" onclick="{poiSelModal}">
+					<input name="poi" type="hidden" value="{JSON.stringify(opts.address.poi)}" required>
+					<p class="form-control-static sjdjtcont"
+					   onclick="{poiSelModal}"
+					   if="{opts.address.poi}">{opts.address.poi.base_info.business_name + (opts.address.poi.base_info.branch_name ? '(' + opts.address.poi.base_info.branch_name + ')' : '')}
+          </p>
+					<p class="form-control-static" if="{!opts.address.poi}">
+						<span class="sjdjt" 
+							if="{opts.pois}" 
+							onclick="{poiSelModal}">
+							{(forms['joinForm'].poi.$error.required && opts.stateView.submitted) ? '请选择门店' : '选择门店'}
+						</span>
+						<span class="sjdjt" if="{!opts.pois}">门店加载中</span>
+					</p>
+					<p if="{forms['joinForm'].poi.$error.required}" class="help-block">请选择门店</p>
+				</div>
+				<div class="col-xs-1 span-right">
+					<span onclick="{poiSelModal}"><img src="https://img.91pintuan.com/right.png" alt="" /></span>
+				</div>
+			</div>
+			<!--给卖家留言-->
+			<div class="form-group bgcolor-white">
+				<div class="col-xs-11">
+					<textarea type="text" 
+						id="textarea"
+						class="form-control"
+          	onchange="{onChangeRemark}"
+						placeholder="{opts.group.commodity.remark ? opts.group.commodity.remark : '给卖家留言'}"/>
+					</textarea>
+				</div>
+			</div>
+			<!--【虚拟商品】注释-->
+			<div class="col-xs-12" id="virtual" if="{opts.group.commodity.scene === 'virtual'}">
+	      <p>注：参团且拼团成功时，直接在线发送虚拟商品消费凭证</p>
+	    </div>
+			<!--页面底部灰色距离-->
+			<div class="form-group sevenpx" if="{!opts.group.commodity.coll}"></div>
+			<!--支付-->
+			<div class="group-pay">
+				<!--【阶梯团】-->
+				<span if="{opts.group.commodity.status.model === 'ladder'}">
+				  <span class="myspan">需支付定金:</span>
+				  <span class="myspan">{$.util.filter.currency(opts.group.commodity.ladder.prepay)}</span>
+				</span>
+				<!--【分享团】-->
+				<span if="{opts.group.commodity.status.model === 'share'}" >
+				  <span class="myspan">合计&nbsp;</span>
+				  <span class="myspan">{$.util.filter.currency(opts.totalFee + opts.deliveryPayment)}</span>
+				  <span if="{opts.deliveryPayment}" class="postage">
+				  	(包括邮费: {$.util.filter.currency(opts.deliveryPayment)})
+				  </span>
+				</span>
+				<!--【佣金团】-->
+				<span if="{opts.group.commodity.status.model === 'distribution'}" >
+				  <span class="myspan">合计&nbsp;</span>
+				  <span class="myspan">{$.util.filter.currency(opts.totalFee + ((opts.group.selectScene === 'logistics' || opts.group.commodity.scene === 'logistics') ? opts.deliveryPayment : 0))}</span>
+				 	<span if="{ opts.deliveryPayment && (opts.group.selectScene === 'logistics' || opts.group.commodity.scene === 'logistics')}" class="postage">
+				  	(包括邮费: {$.util.filter.currency(opts.deliveryPayment)})
+				  </span>
+				</span>
+				<!--【支付】-->
+				<button onclick="{participate}" 
+					class="btn btn-pay" 
+					disabled="{opts.stateView.submiting}">
+					{opts.stateView.submiting ? '支付中...' : '确认支付'}
+				</button>
+			</div>
+		</form>
+	</div>
+	<script>
+    import {connect} from 'ninjiajs';
+    import commActions from '../commodity/commodity.actions';
+    import docActions from '../document/document.actions';
+    import actions from './group.actions';
+    import Cookies from '../../framework/cookie';
+		import { domEvent, syncEvent } from 'riot-mixin-pack';
+
+		let me = this;
+    this.mixin('router');
+    this.mixin('form');
+    this.useForm();
+
+		/**
+		 *  selectors
+		 */
+		const isLimitPurchase = group => group.commodity && group.commodity.logistic && group.commodity.logistic.type === '1' || false;
+		const totalFee = group => {
+			if(group && group.commodity){
+				return group.commodity.model === 'ladder' ? group.commodity.ladder.prepay : group.commodity.prepay;
+			}
+			return 0
+		}
+
+    connect(
+      state => ({
+        group: state.group,
+        stateView: state.joinGroupViewMeta,
+        merchant: state.merchant,
+        commInfoAlbums: state.commInfoAlbums,
+        route: state.route,
+        user: state.user,
+        pois: state.groupPois,
+        provinces: state.joinGroupProvinces,
+        cities: state.joinGroupCities,
+        area: state.selectJoinGroupAddress,
+        deliveryPayment: state.deliveryPayment,
+        address: state.joinGroupAddress,
+        addr_stic: state.joinGroupAddrStic,
+				isLimitPurchase: isLimitPurchase(state.group),
+				totalFee: totalFee(state.group)
+      }),
+      dispatch => ({
+				// enter: opts => dispatch(actions.enterGrouopInfoJoin(opts)),
+        participate: () => dispatch(actions.participate()),
+				loadGroupById: (id, done) => dispatch(actions.loadGroupById(id, done)),
+        updateJoinGroupAddress: address => dispatch(actions.updateJoinGroupAddress(address)),
+        loadJoinGroupAddress: () => dispatch(actions.loadJoinGroupAddress()),
+        changeJoinGroupProvince: (province, tag) => dispatch(actions.changeJoinGroupProvince(province, tag)),
+        initJoinGroupAddress: user => dispatch(actions.initJoinGroupAddress(user)),
+        loadGroupByIdAndInitArea: (id, done) => dispatch(actions.loadGroupByIdAndInitArea(id, done)),
+        getComm: (id, done) => dispatch(commActions.getComm(id, done)),
+        getCommInfoAlbums: (id, done) => dispatch(commActions.getCommInfoAlbums(id, done)),
+        changeDocGroup: (action, done) => dispatch(docActions.changeDocGroup(action, done)),
+        changeCommId: id => dispatch(commActions.changeCommId(id)),
+				selectScene: scene => dispatch(actions.selectScene(scene, me)),
+				selectJoinGroupDistrict: (district, isLimitPurchase) => dispatch(actions.selectJoinGroupDistrict(district, isLimitPurchase))
+      })
+    )(this);
+
+		// this.on('mount', () => this.opts.enter(this.opts));
+		this.on('mount', async () => {
+			let dispatch = app.store.dispatch;
+      dispatch({type: 'changeTitle', payload: '参团'});
+			dispatch({type: 'setDeliveryPayment', payload: null});
+      dispatch({type: 'setJoinGroupAddrStic', payload: {}});
+      dispatch({type: 'setJoinGroupAddrHad', payload: false});
+      if(this.opts.user){
+        this.opts.initJoinGroupAddress(opts.user);
+      }
+      this.opts.loadJoinGroupAddress();
+			console.warn('1!!!')
+			let loadGroupByIdAndInitArea = app.context.util.promisify(this.opts.loadGroupByIdAndInitArea);
+			await loadGroupByIdAndInitArea(this.opts.id);
+			console.warn('2@@@@')
+			if(this.opts.group && this.opts.group.commodity && this.opts.group.commodity.scene){
+				let scene = null;
+				switch(this.opts.group.commodity.scene){
+					case 'poi':
+						scene = 'poi';
+						break;
+					case 'logistics':
+						scene = 'logistics';
+						break;
+					case 'collection':
+						scene = 'collection';
+						break;
+					case 'virtual':
+						scene = 'virtual';
+						break;
+				}
+				this.opts.selectScene(scene);
+			}
+			let group = this.opts.group;
+			if(group
+			&& group.commodity
+			&& group.commodity.scene
+			&& group.commodity.scene.split('_').length
+			&& group.commodity.scene.split('_').length > 1
+			){
+				this.opts.selectScene('poi');
+			}
+    })
+		
+    this.onChangePoi = e => e.target.value && this.opts.updateJoinGroupAddress({poi: JSON.parse(e.target.value)});
+    this.onChangeTelephone = e => this.opts.updateJoinGroupAddress({telephone: e.target.value});
+    this.onChangeName = e => this.opts.updateJoinGroupAddress({name: e.target.value});
+    this.onChangeRemark = e => this.opts.updateJoinGroupAddress({remark: e.target.value});
+    this.onChangeAddress = e => this.opts.updateJoinGroupAddress({address: e.target.value});
+		this.onClickSelectScene = e => this.opts.selectScene(e.currentTarget.getAttribute('value'))
+    this.onSelectJoinGroupProvince = e => this.opts.changeJoinGroupProvince(e.target.value, this);
+
+    this.onSelectJoinGroupCity = e => {
+      let dispatch = app.store.dispatch;
+      dispatch({type: 'setDeliveryPayment', payload: 0});
+      if(!e.target.value){
+				return dispatch({type: 'selectJoinGroupCity', payload: null});
+      }
+      dispatch({type: 'setDeliveryPayment', payload: 0});
+      dispatch({type: 'selectJoinGroupCity', payload: JSON.parse(e.target.value)});
+    }
+
+    this.onSelectJoinGroupDistrict = e => this.opts.selectJoinGroupDistrict(e.target.value, this.opts.isLimitPurchase);
+
+    this.participate = () => {
+      if (!this.forms['joinForm'].$validate()) {
+        app.store.dispatch({type: 'setJoinGroupSubmited', payload: true});
+        return false;
+      }
+      this.opts.participate();
+    };
+
+    this.poiSelModal = params => {
+      var modal = widgets.Modal.open({
+        tag: 'group-poi-modal',
+        size: 'lg'
+      })
+      
+      modal.one('dismiss', poi => {
+        app.store.dispatch({type: 'updateJoinGroupAddress', payload: {poi}})
+				this.poi.value = poi;
+				triggerDomEvent('input', this.poi);
+				function triggerDomEvent(eventName, root){
+					var e = document.createEvent('Event')
+					e.initEvent(eventName, true, true)
+					setTimeout(() => {
+						root.dispatchEvent(e);
+					}, 0)
+				}
+      })
+    }
+
+	</script>
+</group-info-join>

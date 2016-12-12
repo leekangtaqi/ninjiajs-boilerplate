@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="format-detection" content="telephone=no"/>
+    <title>91拼团</title>
+    <script src="//res.wx.qq.com/open/js/jweixin-1.1.0.js"></script>
+   
+  </head>
+  <body>
+    <app>{{ html | safe }}</app>
+    <alert></alert>
+    <modal></modal>
+    
+		<script>
+			window.__INITIAL_STATE__ = {{ JSON.stringify(state) }}
+		</script>
+		{% if env === 'production' %}
+		<script src="/dist/client/assets/js/bundle.js"></script>
+		{% else %}
+		<script>var body = document.getElementsByTagName('body')[0];var script = document.createElement('script');script.src = window.location.origin + ':8080' + '/client/app/bundle.js';body.appendChild(script);</script>
+		{% endif %}
+  </body>
+</html>

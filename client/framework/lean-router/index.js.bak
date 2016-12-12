@@ -1,0 +1,83 @@
+
+// function recursiveHints(hints, context){
+        //     if(!hints.length || isBreak){
+        //         me.busy = false;
+        //         me.trigger('busy-resolve');
+        //         return;
+        //     }
+        //     let path = hints[0];
+        //     let request = {};
+        //     let {route, params, $state, $location} = me._getMetaDataFromRouteMap(path);
+        //     if(!route){
+        //         return recursiveHints(hints.slice(1));
+        //     }
+        //     let tag = route.tag;
+        //     isFounded = true;
+        //     request.params = params;
+        //     request.query = req.query;
+        //     request.body = {};
+        //     let ctx = {
+        //         request
+        //     };
+        //     if(context){
+        //         Object.assign(context.request, {params: ctx.request.params, query: ctx.request.query, body: ctx.request.body || {}});
+        //         ctx = context
+        //     }
+        //     if((!tag.hasOwnProperty('show') || tag.show) 
+        //         && Util.completePart(path) === me.location){
+        //         return recursiveHints(hints.slice(1), ctx);
+        //     }
+        //     me.trigger('state-change', {$state, $location, ctx});
+        //     if(route.redirectTo){
+        //         isBreak = true;
+        //         return riot.route(route.redirectTo);
+        //     }
+        //     if(route.resolve){
+        //         return route.resolve.apply(tag, [done, ctx]);
+        //     }
+        //     console.warn("!!!!!!");
+        //     done();
+        //     function done(data){
+        //         if(ctx && data){
+        //             !ctx.body && (ctx.body = {});
+        //             Object.assign(ctx.body, data);
+        //         }
+        //         let RAFId = requestAnimationFrame(() => {
+        //             me.trigger('history-pending',
+        //                 me._getMetaDataFromRouteMap(me.location).route, 
+        //                 $state,
+        //                 $location,
+        //                 ctx,
+        //                 me._executeMiddlewares(tag, tag.$mws, ctx, pendingDone),
+        //             );
+        //             console.warn(cancelAnimationFrame);
+        //             cancelAnimationFrame(RAFId);
+        //             console.warn(RAFId);
+        //             RAFId = undefined;
+        //         });
+        //         function pendingDone(){
+        //             let from = me._getMetaDataFromRouteMap(me.location).route;
+        //             let to = route;
+        //             let RAFId = requestAnimationFrame(() => {
+        //                 cancelAnimationFrame(RAFId);
+        //                 RAFId = undefined;
+        //                 me.trigger('history-resolve', 
+        //                     from, 
+        //                     to, 
+        //                     ctx, 
+        //                     hints, 
+        //                     () => {
+        //                         me.trigger('history-success',
+        //                             from, 
+        //                             to
+        //                         );
+        //                         me.location = $location;
+        //                         recursiveHints(hints.slice(1), ctx);
+        //                     }
+        //                 )
+        //             })
+        //         }
+        //     }
+        // }
+
+        // recursiveHints(req.hints);

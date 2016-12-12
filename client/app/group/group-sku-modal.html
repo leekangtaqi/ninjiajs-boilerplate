@@ -1,0 +1,64 @@
+<group-sku-modal>
+	<div class="modal-body">
+		<div class="skudiv">
+			<img-lazy-loader width="75" height="45" style="float: left;border-radius: 5px;" if="{!opts.group.commodity.info.cover}" class="img-responsive" holder="svg:holder.js/20px20?theme=gray&text= 91拼团 "></img-lazy-loader>
+			<img if="{opts.group.commodity.info.cover}" class="skuimg" riot-src="{opts.group.commodity.info.cover ? app.config.phtUri + opts.group.commodity.info.cover : ''}" />
+			<p class="skupm">{opts.group.commodity.info.name}</p>
+		</div>
+		<div each="{sku, index in opts.group.commodity.sku}">
+			<h4 class="skupf">{sku.norms.name}</h4>
+			<!--当某种库存没有的时候将lable中的class换成skufc-->
+			<radio-group class="{xx: true}" onchange="{parent.onItemsChange}">
+				<radio
+					disabled="{ parent.parent.stocks[item.id] == 0 }"
+					class="{skumr: parent.parent.stocks[item.id] > 0, skufc: parent.parent.stocks[item.id] < 1 }" 
+					value="{item.id}" 
+					each="{ item in sku.items }">{ item.name }
+				</radio>
+			</radio-group>
+		</div>
+		
+		<div class="skubtndiv">
+			<button class="btn btnsku" onclick="{goPay}">下一步</button>
+		</div>
+	</div>
+	<script>
+		import Cookies from '../../framework/cookie';
+
+		let me = this;
+
+		this.on('mount', ()=>{
+			this.commodity = this.opts.group.commodity;
+			let group = this.opts.group;
+			this.items = [];
+			$.get(`/commodity/${group.commodity.id}/sku/stock`).then(stocks=>this.update({stocks: stocks}));
+		});
+
+		this.onItemsChange = e => {
+			if(this.stocks[e.target.value] == 0){
+				return;
+			}
+			this.items[e.item.index] = e.target.value
+		};
+
+		this.goPay = () => {
+			if(this.items.length < 1){
+				widgets.Alert.add('warn', '请选择规格');
+				return false;
+			}
+			for(var i=0; i < this.opts.group.commodity.sku.length; i++){
+				if(!this.items[i]) {
+					widgets.Alert.add('warn', '请选择规格');
+					return false;
+				}
+			}
+			var key = 'grp_sku_' + this.opts.group.id;
+			$.post(`/commodity/${this.opts.group.commodity.id}/sku/stock`, {skus: this.items}).then(stocks => {
+					me.trigger('dismiss');
+					// 使用的stock
+					Cookies.set(key, stocks.id);
+					location.href = `${location.origin}/wepay/?id=${this.opts.group.id}&showwxpaytitle=1&tag=group-info-join`;
+			});
+		}
+	</script>
+</group-sku-modal>

@@ -1,0 +1,8 @@
+<group-sku>
+  <div class="comm-sku" if="{opts.group.commodity.sku.length}">
+    <div each="{sku in opts.group.commodity.sku}">
+      <span class="sku-name">{sku.norms.name}</span>
+      <span class="sku-cont" each="{item, index in sku.items}" >{item.name}<span class="sku-color">{index === parent.sku.items.length - 1 ? '' : '，'}</span></span>
+    </div>
+  </div>
+</group-sku>
