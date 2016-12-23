@@ -3,7 +3,7 @@
  */
 import CommodityList from './commodity/CommodityList';
 import About from './about/About';
-// import Nest from './about/Nest';
+import Nest from './about/Nest';
 import App from './App';
 
 export default {
@@ -19,12 +19,12 @@ export default {
 			path: '/about',
 			defaultRoute: true,
 			component: About,
-			// children: [
-			// 	{
-			// 		path: '/nest',
-			// 		component: Nest
-			// 	}
-			// ]
+			children: [
+				{
+					path: '/nest',
+					component: Nest
+				}
+			]
 		}
 	]
 }

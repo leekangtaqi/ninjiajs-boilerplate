@@ -11,6 +11,8 @@ export default class About extends riot.Tag {
 			<div>about</div>
 			<div>{ opts.$show }</div>
 			<div>end about</div>
+			<a href="/about/nest">jump to nest</a>
+			<router-outlet></router-outlet>
 		`
 	}
 	get attrs() {

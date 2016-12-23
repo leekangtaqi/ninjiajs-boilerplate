@@ -15,14 +15,20 @@ const pick = (o, ...fs) =>
             return acc;
         }, {})
 
-const omit = (o, ...fs) => 
-    Object.keys(o)
+const omit = (o, ...fs) => {
+    let args = fs;
+    let p1 = fs[0];
+    if (Array.isArray(p1)) {
+        fs = p1;
+    }
+    return Object.keys(o)
         .filter(f => fs.indexOf(f) < 0)
         .map(f=>({key: f, val: o[f]}))
         .reduce((acc, pair) => {
             acc[pair.key] = pair.val;
             return acc;
         }, {})
+}
         
 const clone = item => {
     if (!item) { return item; } // null, undefined values check
@@ -100,6 +106,23 @@ const deepEqual = (x, y) => {
       }, true) : (x === y);
 }
 
+const camelToLine = str => {
+    let res = "";
+    for (let i=0, len=str.length; i<len; i++) {
+        let c = str.charAt(i);
+        if (/^[A-Z]+$/.test(c)) {
+            if (i===0) {
+                res += `${c.toLowerCase()}`;
+            } else {
+                res += `-${c.toLowerCase()}`;
+            }
+        } else {
+            res += c;
+        }
+    }
+    return res;
+}
+
 export default {
     values, 
     mixin, 
@@ -108,5 +131,6 @@ export default {
     clone, 
     deepEqual,
     omit,
-    pick
+    pick,
+    camelToLine
 }

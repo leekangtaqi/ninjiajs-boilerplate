@@ -242,11 +242,7 @@ class Hub {
             }
             function done(){
                 if (!target.tag || !target.tag.isMounted) {
-                    console.warn("should tag............");
-                    console.warn(target.component.displayName);
                     let outletEl = outlet.root.querySelector(`div[data-tag-name="${target.component.displayName}"]`);
-                    console.warn(outletEl);
-                    console.warn(target.component.name);
                     let tag = new target.component(outletEl);
                     if (tag) {
                         tag.$routePath = target.path;

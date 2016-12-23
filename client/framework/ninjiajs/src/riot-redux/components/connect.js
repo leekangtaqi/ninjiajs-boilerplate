@@ -117,6 +117,10 @@ export default function connect(mapStateToOpts, mapDispatchToOpts, mergeOpts, op
         }
 
         class Connect extends WrappedComponent {
+            get name() {
+                return 'connect-' + super.name || WrappedComponent.name
+            }
+
             onCreate(opts) {
                 this.version = version;
                 this.store = opts.store || getProvider(this).opts.store;

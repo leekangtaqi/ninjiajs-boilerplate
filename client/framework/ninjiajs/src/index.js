@@ -3,6 +3,7 @@ import Application from './application';
 import { provider, connect } from './riot-redux';
 import viewCreator from './view';
 import { view } from './riot-router-redux';
+import form from './riot-redux-form';
 
 let { hub } = router;
 
@@ -26,4 +27,4 @@ hub.on('history-success', (from, to) => {
 		// to && to.tag && to.tag.trigger('entered');
 });
 
-export { router, Application as Ninjia, provider, connect, view }
+export { router, Application as Ninjia, provider, connect, view, form }

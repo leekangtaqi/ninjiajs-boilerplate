@@ -1,6 +1,7 @@
 import * as riot from 'riot';
 import { Ninjia, router, connect, provider, view } from '../../framework/ninjiajs/src/index';
 
+@view
 export default class Nest extends riot.Tag {
 	get name() {
 		return 'nest'

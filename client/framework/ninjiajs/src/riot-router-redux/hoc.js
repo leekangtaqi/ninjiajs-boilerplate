@@ -1,4 +1,5 @@
 import { getProvider } from '../riot-redux/components/provider';
+import _ from '../util';
 
 const isShow = (views, tag) => {
 	if(tag.$routePath){
@@ -53,7 +54,7 @@ export default function view(WrappedComponent) {
 		const connectDisplayName = `View(${getDisplayName(WrappedComponent)})`;
 		class View extends WrappedComponent {
 			get name() {
-				return ''
+				return _.camelToLine(super.name);
 			}
 			onCreate(opts) {
 				this.displayName = connectDisplayName;

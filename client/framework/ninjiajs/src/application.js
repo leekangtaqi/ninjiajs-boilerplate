@@ -3,6 +3,7 @@ import { configureStore } from './store';
 import riotRouterRedux from './riot-router-redux';
 import router from './router';
 import { provide, connect } from './riot-redux';
+import formReducer from './riot-redux-form/reducer';
 
 class Ninjia {
 	/**
@@ -14,11 +15,12 @@ class Ninjia {
 		}
 		this.framework = riot;
 		this.container = container;
-		this.reducer = reducer;
+		let finalReducer = { ...reducer, ...formReducer };
+		this.reducer = finalReducer;
 		this.middlewares = middlewares;
 		this.buildInProps = ['env', 'entry', 'context', 'mode'];
 		this._mode = 'hash';
-		this._store = configureStore(state, reducer, middlewares, this._mode);
+		this._store = configureStore(state, this.reducer, middlewares, this._mode);
 		this.router(router);
 		this._context = {
 				store: this._store,
