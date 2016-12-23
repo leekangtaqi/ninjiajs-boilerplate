@@ -56,9 +56,8 @@ function registerValidators(name, fn){
 
 
 /**
- * HOC:
- * this: $inputs 
- * opts: forms, $validate, addClass
+ * HOC: 
+ * opts: forms, submit
  */
 export default function form(inputRulePairs) {
 	return function wrapComponent (WrappedComponent) {
@@ -80,6 +79,14 @@ export default function form(inputRulePairs) {
 					if (!this.refs[formName]) {
 						console.warn(`failed to submit the form, can not find the form [name]${formName}`)
 					}
+					let forms = this.extractFormNamesFromRef().map(fn => this.refs[fn])
+					forms.forEach(f => {
+						let inputs = this.extractInputsFromForm(f).map(inp => this.refs[inp]);
+						inputs.forEach(input => {
+							this.validate(input, input.value)
+						})
+					})
+					
 					store.dispatch({type: 'form/submit', payload: formName})
 				}
 			}
@@ -207,7 +214,7 @@ export default function form(inputRulePairs) {
 				let finalDels = [];
 
 				for (let formName of formsNames) {
-					let inputObjMap = extractField(formsInStore[formName]);
+					let inputObjMap = _.extractField(formsInStore[formName]);
 					let inputObjArr = Object.keys(inputObjMap).map(k => inputObjMap[k].$name);
 					let { adds, dels } = this.distinctInput(this.extractInputsFromForm(this.refs[formName]), inputObjArr, i =>  i.attributes["ref"].value)
 					finalAdds = finalAdds.concat({ formName, inputs: adds });
@@ -321,8 +328,11 @@ export default function form(inputRulePairs) {
 				if (inputJson.$error[ruleName]) {
 					delete inputJson.$error[ruleName]
 				}
+				
 				if (val != inputJson.$originVal) {
 					inputJson.$dirty = true;
+				} else {
+					inputJson.$dirty = false;
 				}
 				inputJson.$pristine = !inputJson.$dirty;
 				return inputJson;
@@ -332,9 +342,11 @@ export default function form(inputRulePairs) {
 				inputJson.$valid = false;
 				inputJson.$invalid = true;
 				inputJson.$error[ruleName] = true
-
+				
 				if (val != inputJson.$originVal) {
 					inputJson.$dirty = true;
+				} else {
+					inputJson.$dirty = false;
 				}
 				inputJson.$pristine = !inputJson.$dirty;
 				return inputJson;
@@ -342,19 +354,19 @@ export default function form(inputRulePairs) {
 
 			resolveClass(field, input) {
 				if(Object.keys(field.$error).length > 0){
-					removeClass(input, 'f-valid');
-					addClass(input, 'f-invalid');
+					_.removeClass(input, 'f-valid');
+					_.addClass(input, 'f-invalid');
 				}else{
-					removeClass(input, 'f-invalid');
-					addClass(input, 'f-valid');
+					_.removeClass(input, 'f-invalid');
+					_.addClass(input, 'f-valid');
 				}
 				if(field.$dirty) {
-					addClass(input, 'f-dirty');
-					removeClass(input, 'f-pristine');
+					_.addClass(input, 'f-dirty');
+					_.removeClass(input, 'f-pristine');
 				}
 				if(field.$pristine){
-					addClass(input, 'f-pristine');
-					removeClass(input, 'f-dirty');
+					_.addClass(input, 'f-pristine');
+					_.removeClass(input, 'f-dirty');
 				}
 			}
 
@@ -410,49 +422,7 @@ export default function form(inputRulePairs) {
 					$valid: false,
 					$invalid: true,
 					$submitted: false,
-					$error: {},
-					$ok: function(){
-						let o = extractField(this);
-						let errors = Object.keys(o).filter(field => o && o[field].$error && Object.keys(o[field].$error).length > 0);
-						if(errors.length){
-								return false;
-						}
-						return true;
-					},
-					$allPristine: function(){
-						let o = extractField(this);
-						return Object.keys(o).map(field => o && o[field].$pristine).reduce((acc, curr) => acc && curr, true);
-					},
-					$allDirty: function(){
-						let o = extractField(this);
-						return Object.keys(o).map(field => o[field].$dirty).reduce((acc, curr) => acc && curr, true);
-					},
-					$validate: function(){
-						if(!validated){
-							validated = !validated;
-							let o = extractField(this);
-							let allInputExist = !!Object.keys(o).map(fieldKey => {
-								return tag[fieldKey];
-							}).reduce((acc, curr) => {
-								if(!curr){
-									return undefined;
-								}
-								return acc;
-							}, {});
-							if(allInputExist){
-								Object.keys(o).map((fieldKey) => {
-									let field = o[fieldKey];
-									if (field.$rule.required === "") {
-										if(tag[fieldKey] && Array.isArray(tag[fieldKey])){
-											tag[fieldKey] = document.getElementsByName(tag[fieldKey][0].getAttribute('name'))[0];
-										}
-										validateField(tag[fieldKey].value, tag[fieldKey], field, tag);
-									}
-								});
-							}
-						}
-						return this.$ok();
-					}
+					$error: {}
 				};
 				
 				store.dispatch({type: 'form/add', payload: form});
@@ -490,57 +460,5 @@ export default function form(inputRulePairs) {
 			}
 
 		} 
-	}
-}
-
-function extractField(o){
-    return exclude(o,
-        "$name",
-        "$dirty",
-        "$pristine",
-        "$valid",
-        "$invalid",
-        "$submitted",
-        "$error",
-        "$ok",
-        "$allPristine",
-        "$allDirty",
-        "$validate",
-		"$meta"
-    );
-}
-
-function exclude(){
-    var args = [].slice.apply(arguments);
-    var o = args[0];
-    var props = args.slice(1);
-    var res = {};
-    for(var p in o){
-        if(props.indexOf(p) < 0){
-            res[p] = o[p]
-        }
-    }
-    return res;
-}
-
-function hasClass(el, className) {
-	if (el.classList)
-		return el.classList.contains(className);
-	else
-		return !!el.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'))
-}
-
-function addClass(el, className) {
-	if (el.classList)
-		el.classList.add(className);
-	else if (!hasClass(el, className)) el.className += " " + className
-}
-
-function removeClass(el, className) {
-	if (el.classList)
-		el.classList.remove(className);
-	else if (hasClass(el, className)) {
-		var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
-		el.className=el.className.replace(reg, ' ')
 	}
 }

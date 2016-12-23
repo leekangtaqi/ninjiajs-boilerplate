@@ -85,7 +85,7 @@ const forms = (forms = initForm , action) => {
 			...inputsMap })
 
 			const isInvalid = () => {
-				let inputs = extractField(formMeta);
+				let inputs = _.extractField(formMeta);
 				return Object.keys(inputs).filter(i => {
 					let errors = inputs[i].$error
 					return Object.keys(errors).length > 0
@@ -110,36 +110,6 @@ const forms = (forms = initForm , action) => {
 		default:
 			return forms;
 	}
-}
-
-function extractField(o){
-    return exclude(o,
-        "$name",
-        "$dirty",
-        "$pristine",
-        "$valid",
-        "$invalid",
-        "$submitted",
-        "$error",
-        "$ok",
-        "$allPristine",
-        "$allDirty",
-        "$validate",
-		"$meta"
-    );
-}
-
-function exclude(){
-    var args = [].slice.apply(arguments);
-    var o = args[0];
-    var props = args.slice(1);
-    var res = {};
-    for(var p in o){
-        if(props.indexOf(p) < 0){
-            res[p] = o[p]
-        }
-    }
-    return res;
 }
 
 export default { forms }

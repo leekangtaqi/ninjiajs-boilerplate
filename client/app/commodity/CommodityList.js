@@ -5,11 +5,14 @@ import { Ninjia, router, connect, provider, view, form } from '../../framework/n
 	username: {
 		required: true,
 		maxlength: 10
+	},
+	sex: {
+		required: true
 	}
 })
 @view
 @connect(state => ({
-	test: true
+	test: '111'
 }))
 export default class CommodityList extends riot.Tag {
 	get name() {
@@ -23,17 +26,19 @@ export default class CommodityList extends riot.Tag {
 		<form ref="userForm" onsubmit="{ onSubmit }">
 			<input ref="username">
 			<p if="{opts.forms &&  opts.forms.userForm.$submitted && opts.forms.userForm.username.$error.maxlength}">长度过长</p>
-			<p if="{opts.forms &&  opts.forms.userForm.$submitted && opts.forms.userForm.username.$error.required}">必填</p>
-			<select>
-				<option>a</option>
-				<option>b</option>
-				<option>c</option>
+			<p if="{opts.forms &&  opts.forms.userForm.$submitted && opts.forms.userForm.username.$error.required}">姓名必填</p>
+			<select ref="sex">
+				<option>请选择</option>
+				<option value="0">男</option>
+				<option value="1">女</option>
 			</select>
+			<p if="{opts.forms &&  opts.forms.userForm.$submitted && opts.forms.userForm.sex.$error.required}">性别必填</p>
 			<button>提交</button>
 		</form>
 		<div>CommodityList begin</div>
 		<div>{ opts.$show }</div>
 		<div>{ opts.test }</div>
+		<div>{ opts.forms && opts.forms.userForm.$dirty }</div>
 		<div>CommodityList end</div>
 		`
 	}
@@ -60,6 +65,7 @@ export default class CommodityList extends riot.Tag {
 		}
 		// valid
 		console.warn("ok");
-		
+		console.warn(this.refs['username'].value);
+		console.warn(this.refs['sex'].value);
 	}
 }

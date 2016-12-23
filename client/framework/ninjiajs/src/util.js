@@ -123,6 +123,58 @@ const camelToLine = str => {
     return res;
 }
 
+function extractField(o){
+    return exclude(o,
+        "$name",
+        "$dirty",
+        "$pristine",
+        "$valid",
+        "$invalid",
+        "$submitted",
+        "$error",
+        "$ok",
+        "$allPristine",
+        "$allDirty",
+        "$validate",
+		"$meta"
+    );
+}
+
+function exclude(){
+    var args = [].slice.apply(arguments);
+    var o = args[0];
+    var props = args.slice(1);
+    var res = {};
+    for(var p in o){
+        if(props.indexOf(p) < 0){
+            res[p] = o[p]
+        }
+    }
+    return res;
+}
+
+function hasClass(el, className) {
+	if (el.classList)
+		return el.classList.contains(className);
+	else
+		return !!el.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'))
+}
+
+function addClass(el, className) {
+	if (el.classList)
+		el.classList.add(className);
+	else if (!hasClass(el, className)) el.className += " " + className
+}
+
+function removeClass(el, className) {
+	if (el.classList)
+		el.classList.remove(className);
+	else if (hasClass(el, className)) {
+		var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+		el.className=el.className.replace(reg, ' ')
+	}
+}
+
 export default {
     values, 
     mixin, 
@@ -132,5 +184,10 @@ export default {
     deepEqual,
     omit,
     pick,
-    camelToLine
+    camelToLine,
+    exclude,
+    extractField,
+    hasClass,
+    addClass,
+    removeClass
 }

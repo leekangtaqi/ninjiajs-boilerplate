@@ -596,7 +596,7 @@ var hub = new Hub(riot.observable());
 export default { 
 	hub: hub,
 	$use: function(fn){
-			!this.$mws && (this.$mws = []);
-			this.$mws.push(fn);
+        !this.$mws && (this.$mws = []);
+        this.$mws.push(fn);
 	}
 };
