@@ -60,6 +60,9 @@ app.start(async () => {
      * router interceptors.
      */
     app.hub.on('history-pending', (from, to, $location, ctx, next) => {
+        if (ctx.req.body.authenticate) {
+            return next();
+        }
         next && next();
     });
 

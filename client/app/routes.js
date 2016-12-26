@@ -19,6 +19,7 @@ export default {
 			path: '/about',
 			defaultRoute: true,
 			component: About,
+			authenticate: true,
 			children: [
 				{
 					path: '/nest',

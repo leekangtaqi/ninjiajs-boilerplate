@@ -140,7 +140,7 @@ function extractField(o){
     );
 }
 
-function exclude(){
+function exclude() {
     var args = [].slice.apply(arguments);
     var o = args[0];
     var props = args.slice(1);

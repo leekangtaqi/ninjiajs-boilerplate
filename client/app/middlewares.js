@@ -1,3 +1,5 @@
+import { isFSA } from 'flux-standard-action';
+
 const logger = store => next => action => {
     let actionName = null;
     let actionShow = null;
@@ -43,11 +45,26 @@ const timeoutScheduler = store => next => action => {
     }
 };
 
-const vanillaPromise = store => next => action => {
-    if (typeof action.then !== 'function') {
-        return next(action)
+function isPromise(val) {
+  return val && typeof val.then === 'function';
+}
+
+const vanillaPromise = ({ dispatch }) => next => action => {
+    if (!isFSA(action)) {
+      return isPromise(action)
+        ? action.then(dispatch)
+        : next(action);
     }
-    return Promise.resolve(action).then(store.dispatch)
+
+    return isPromise(action.payload)
+      ? action.payload.then(
+          result => dispatch({ ...action, payload: result }),
+          error => {
+            dispatch({ ...action, payload: error, error: true });
+            return Promise.reject(error);
+          }
+        )
+      : next(action);
 };
 
 const readyStatePromise = store => next => action => {

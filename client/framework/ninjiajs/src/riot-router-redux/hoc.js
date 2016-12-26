@@ -56,6 +56,11 @@ export default function view(WrappedComponent) {
 			get name() {
 				return _.camelToLine(super.name);
 			}
+
+			get attrs() {
+				return 'show="{ opts.$show }"'
+			}
+
 			onCreate(opts) {
 				this.displayName = connectDisplayName;
 				let provider = getProvider(this)

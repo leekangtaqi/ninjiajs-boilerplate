@@ -20,7 +20,6 @@ class Hub {
         this._view = null;
         this._busy = false;
         this._routes = [];
-        // this._routesMap = {};
         this._defaultRoute = null;
         this._location = null;
         this._prev = null;
@@ -109,7 +108,8 @@ class Hub {
     routeTo(route, ctx, hint, redirect = false, level, cb) {
         this.busy = false;
         this.trigger('busy-resolve');
-        if(redirect){
+
+        if (redirect) {
             return route(route.path);
         }
         
@@ -117,13 +117,17 @@ class Hub {
             && Util.completePart(route.path) === this.location) {
             return;
         }
+
         let $state = route.path;
         let $location = hint;
+
         this.trigger('state-change', {$state, $location, ctx});
+
         if (route.redirectTo) {
             route(route.redirectTo);
             return true;
         }
+
         let addons = {
             hints: ctx.req.hints,
             req: ctx.req,
@@ -133,9 +137,11 @@ class Hub {
             $location,
             index: level
         }
-        if(route.resolve){
+
+        if (route.resolve) {
             return route.resolve.apply(route.tag, [(data) => {this.routeToDone(data, ctx, addons, cb)}, ctx]);
         }
+
         this.routeToDone(null, ctx, addons, cb);
     }
 
@@ -148,6 +154,7 @@ class Hub {
     match(rule, uri) {
         let parts = Util.distinct(rule.split('/').map(r => Util.completePart(r)));
         let fragments = Util.distinct(uri.split('/').map(r => Util.completePart(r)));
+        
         if(
             !rule || 
             !uri || 
@@ -199,9 +206,9 @@ class Hub {
         let targetRoutes = routes ? routes : this.routes;
 
         for (let i=0, len= targetRoutes.length; i<len; i++) {
-        // for(let route of targetRoutes){
             let route = targetRoutes[i];
             let matchRes = this.match(Util.completePart(route.path), Util.completePart(hint));
+
             if (matchRes) {
                 //assign object to context
                 if(!ctx.req.params){
@@ -222,7 +229,7 @@ class Hub {
             console.info('404');
             this.busy = false;
             this.trigger('busy-resolve');
-            return {ctx, components};
+            return { ctx, components };
         }
         if (!target) {
             console.info('404');
@@ -291,7 +298,7 @@ class Hub {
             !ctx.body && (ctx.body = {});
             Object.assign(ctx.body, data);
         }
-        let RAFId = requestAnimationFrame(() => {
+        let done = () => {
             cancelAnimationFrame(RAFId); 
             RAFId = undefined;
             me.trigger('history-pending',
@@ -308,14 +315,15 @@ class Hub {
                     }
                 ),
             );
-        });
+        }
+        let RAFId = requestAnimationFrame(done);
     }
 
     routeSuccess(data, ctx, {hints, req, route, tag, $state, $location, index}, cb) {
         let me = this;
         let from = me.getMetaDataFromRouteMap(me.location).route;
         let to = route;
-        let RAFId = requestAnimationFrame(() => {
+        let done = () => {
             cancelAnimationFrame(RAFId);
             RAFId = undefined;
             me.trigger('history-resolve', 
@@ -334,7 +342,8 @@ class Hub {
                     cb();
                 }
             )
-        })
+        }
+        let RAFId = requestAnimationFrame(done)
     }
 
     /**

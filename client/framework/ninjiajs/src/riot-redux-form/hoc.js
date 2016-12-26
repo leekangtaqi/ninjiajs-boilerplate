@@ -1,59 +1,6 @@
 import { getProvider } from '../riot-redux/components/provider';
+import { validators } from './validator';
 import _ from '../util';
-
-let validators = {};
-
-let buildinValidators = [
-    {
-        name: "required",
-        fn: function(val){
-            return val.trim() === ""
-        }
-    },
-    {
-        name: 'max',
-        fn: function(val, expected){
-            return parseInt(val.trim(), 10) > expected;
-        }
-    },
-    {
-        name: 'min',
-        fn: function(val, expected){
-            return parseInt(val.trim(), 10) < expected;
-        }
-    },
-    {
-        name: 'maxlength',
-        fn: function(val, expected){
-            return val.length > expected;
-        }
-    },
-    {
-        name: 'minlength',
-        fn: function(val, expected){
-            return val.length < expected;
-        }
-    },
-    {
-        name: 'pattern',
-        fn: function(val, expected){
-            return !(new RegExp(expected)).test(val.trim());
-        }
-    }
-];
-
-/**
- * register build-in validators
- */
-buildinValidators.map(function(validator){
-    registerValidators(validator.name, validator.fn);
-});
-
-function registerValidators(name, fn){
-    validators[name] = fn;
-}
-
-
 
 /**
  * HOC: 
@@ -75,7 +22,7 @@ export default function form(inputRulePairs) {
 
 			mapDispatchToOpts() {
 				let store = this.getStore();
-				this.opts.submit = (formName) => {
+				this.opts.submit = formName => {
 					if (!this.refs[formName]) {
 						console.warn(`failed to submit the form, can not find the form [name]${formName}`)
 					}
@@ -152,23 +99,27 @@ export default function form(inputRulePairs) {
 				// resolve adds
 				if (adds && adds.length) {
 					let formsToUpdate = [];
+
 					adds.forEach(f => {
 						this.addForm(store, f)
 						let inputs = this.getInputs(this.refs[f])
 						let inputsToUpdate = inputs.map(input => this.addInput(store, input, f));
 						formsToUpdate.push({ form: f, inputs: inputsToUpdate })
 					})
+					
 					formsToUpdate.length && store.dispatch({type: 'forms/inputs/add', payload: formsToUpdate});
 				}
 
 				// resolve dels remove all listen handlers
 				if (dels && dels.length) {
 					let formsToRemove = [];
+
 					dels.forEach(f => {
 						this.delForm(store, f)
 						this.getInputs(this.refs[f]).forEach(i => this.delInput(i));
 						formsToRemove.push({ form: f })
 					})
+
 					store.dispatch({type: 'forms/remove', payload: formsToRemove});
 				}
 
@@ -205,23 +156,6 @@ export default function form(inputRulePairs) {
 					}
 					
 				}
-			}
-
-			resolveInputsInFormLoop(formsNames) {
-				let store = this.getStore();
-				let formsInStore = store.getState().forms;
-				let finalAdds = [];
-				let finalDels = [];
-
-				for (let formName of formsNames) {
-					let inputObjMap = _.extractField(formsInStore[formName]);
-					let inputObjArr = Object.keys(inputObjMap).map(k => inputObjMap[k].$name);
-					let { adds, dels } = this.distinctInput(this.extractInputsFromForm(this.refs[formName]), inputObjArr, i =>  i.attributes["ref"].value)
-					finalAdds = finalAdds.concat({ formName, inputs: adds });
-					finalDels = finalDels.concat({ formName, inputs: dels });
-				}
-
-				return { adds: finalAdds, dels: finalDels }
 			}
 
 			distinctForm(curr, allPrev, fn) {
@@ -264,16 +198,6 @@ export default function form(inputRulePairs) {
 				prevs.length && ( dels = prevs )
 
 				return { adds, dels }
-			}
-
-			addInput(store, input, formName) {
-				let inputName = this.getInputName(input);
-				let rulesMap = this.options[inputName];
-				let rules = Object.keys(rulesMap).map(k => ({name: k, value: rulesMap[k]}));
-				let inputInstance = this.getInputInstance(input, formName);
-				rules.map(r => this.addInputRule(inputInstance, r))
-				this.bindInputChange(input);
-				return inputInstance
 			}
 
 			bindInputChange(input) {
@@ -320,6 +244,23 @@ export default function form(inputRulePairs) {
 				})
 				
 				store.dispatch({type: 'forms/inputs/update', payload: {form: formName, inputs: inputsToUpdate}})
+			}
+
+			resolveInputsInFormLoop(formsNames) {
+				let store = this.getStore();
+				let formsInStore = store.getState().forms;
+				let finalAdds = [];
+				let finalDels = [];
+
+				for (let formName of formsNames) {
+					let inputObjMap = _.extractField(formsInStore[formName]);
+					let inputObjArr = Object.keys(inputObjMap).map(k => inputObjMap[k].$name);
+					let { adds, dels } = this.distinctInput(this.extractInputsFromForm(this.refs[formName]), inputObjArr, i =>  i.attributes["ref"].value)
+					finalAdds = finalAdds.concat({ formName, inputs: adds });
+					finalDels = finalDels.concat({ formName, inputs: dels });
+				}
+
+				return { adds: finalAdds, dels: finalDels }
 			}
 
 			inputValid(inputEl, inputJson, ruleName, val) {
@@ -370,6 +311,25 @@ export default function form(inputRulePairs) {
 				}
 			}
 
+			addInput(store, input, formName) {
+				let inputName = this.getInputName(input);
+				let rulesMap = this.options[inputName];
+				let rules = Object.keys(rulesMap).map(k => ({name: k, value: rulesMap[k]}));
+				let inputInstance = this.getInputInstance(input, formName);
+				rules.map(r => this.addInputRule(inputInstance, r))
+				this.bindInputChange(input);
+				return inputInstance
+			}
+
+			addInputRule(input, rule) {
+				input.$rule[rule.name] = rule.value;
+				return input;
+			}
+
+			getInputName(input) {
+				return input.attributes['ref'].value;
+			}
+
 			getInputInstance(input, formName) {
 				let inputPersisted = null;
 				let inputName = this.getInputName(input);
@@ -389,21 +349,6 @@ export default function form(inputRulePairs) {
 					};
 				}
 				return inputPersisted;
-			}
-
-			addInputRule(input, rule) {
-				input.$rule[rule.name] = rule.value;
-				return input;
-			}
-
-			getInputName(input) {
-				return input.attributes['ref'].value;
-			}
-
-			delForm(formName) {
-				this.extractInputsFromForm(this.refs[formName]).map(n => this.refs[n]).forEach(input => {
-					this.unbindInputChange(input)
-				})
 			}
 
 			delInput(inputName, formName) {
@@ -426,6 +371,12 @@ export default function form(inputRulePairs) {
 				};
 				
 				store.dispatch({type: 'form/add', payload: form});
+			}
+
+			delForm(formName) {
+				this.extractInputsFromForm(this.refs[formName]).map(n => this.refs[n]).forEach(input => {
+					this.unbindInputChange(input)
+				})
 			}
 
 			trySubscribe() {

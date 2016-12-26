@@ -29,6 +29,10 @@ let baseConfig = {
         ],
         loaders: [
             {
+                test: /\.tag$/,
+                loader: 'html'
+            },
+            {
                 test: /\.js$/,
                 include: /client/,
                 loader: 'babel',

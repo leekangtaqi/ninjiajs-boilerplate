@@ -6,6 +6,7 @@ export default class About extends riot.Tag {
 	get name() {
 		return 'about'
 	}
+
 	get tmpl() {
 		return `
 			<div>about</div>
@@ -13,18 +14,23 @@ export default class About extends riot.Tag {
 			<div>end about</div>
 			<a href="/about/nest">jump to nest</a>
 			<router-outlet></router-outlet>
+			<div ref="test"></div>
 		`
 	}
+
 	get attrs() {
 		return 'show="{ opts.$show }"'
 	}
+
 	onCreate(opts) {
-		this.on('update', () => {
-			
-			console.warn("about updated");
-		})
+		this.on('update', this.onUpdate)
 		this.message = opts.message
 	}
+
+	onUpdate() {
+		
+	}
+
 	click() {
 		this.message = 'goodbye'
 	}
