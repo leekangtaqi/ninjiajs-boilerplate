@@ -1,9 +1,10 @@
 import * as riot from 'riot';
 import CommodityNest from './CommodityNest';
-import { Ninjia, router, connect, provider, view, form } from '../../framework/ninjiajs/src/index';
+import { Ninjia, register, router, connect, provider, view, form } from '../../framework/ninjiajs/src/index';
 import actions from './commodity.actions';
 import { bindActionCreators } from 'redux'
 
+@register
 @form({
 	username: {
 		required: true,
@@ -24,6 +25,7 @@ import { bindActionCreators } from 'redux'
 	})
 )
 export default class CommodityList extends riot.Tag {
+	static originName = 'commodity-list'
 	get name() {
 		return 'commodity-list'
 	}
@@ -40,7 +42,7 @@ export default class CommodityList extends riot.Tag {
 	}
 
 	onMount() {
-		new CommodityNest(this.refs['commodity-nest'])
+		
 	}
 
 	async onUse(next) {

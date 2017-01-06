@@ -135,6 +135,7 @@ export default function connect(mapStateToOpts, mapDispatchToOpts, mergeOpts, op
                 )
 
                 this.state = { storeState }
+
                 this.clearCache();
 
 

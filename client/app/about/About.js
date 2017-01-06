@@ -1,8 +1,10 @@
 import * as riot from 'riot';
-import { Ninjia, router, connect, provider, view } from '../../framework/ninjiajs/src/index';
+import { Ninjia, register, router, connect, provider, view } from '../../framework/ninjiajs/src/index';
 
+@register
 @view
 export default class About extends riot.Tag {
+	static originName = 'about'
 	get name() {
 		return 'about'
 	}
@@ -16,10 +18,6 @@ export default class About extends riot.Tag {
 			<router-outlet></router-outlet>
 			<div ref="test"></div>
 		`
-	}
-
-	get attrs() {
-		return 'show="{ opts.$show }"'
 	}
 
 	onCreate(opts) {

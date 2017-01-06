@@ -1,4 +1,5 @@
 import * as riot from 'riot';
+import CommodityNest from './commodity/CommodityNest';
 
 export default class App extends riot.Tag {
 	get name() {
@@ -6,12 +7,12 @@ export default class App extends riot.Tag {
 	}
 	get tmpl() {
 		return `
-		<div>grating riot 3!!</div>
-		<ul>
-			<li><a href="/">commodity list</a></li>
-			<li><a href="/about">about us</a></li>
-		</ul>
-		<router-outlet></router-outlet>
+			<div>grating riot 3!!</div>
+			<ul>
+				<li><a href="/">commodity list</a></li>
+				<li><a href="/about">about us</a></li>
+			</ul>
+			<virtual data-is="router-outlet"></virtual>
 		`
 	}
 	get attrs() {

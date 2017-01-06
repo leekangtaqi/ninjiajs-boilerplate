@@ -15,7 +15,7 @@ import route from 'riot-route';
  *  2. remove all router-mixin expect use method
  */
 class Hub {
-    constructor(emitter) {
+    constructor(emitter){
         this._root = null;
         this._view = null;
         this._busy = false;
@@ -29,7 +29,7 @@ class Hub {
         this.refinedRoutes = [];
     }
 
-    startup() {
+    startup(){
         this._parseRoute();
         route.base('/');
         route(this.doRoute.bind(this));
@@ -46,7 +46,7 @@ class Hub {
      * @returns cb
      *  query, params, components, history
      */
-    matches({ routes, location }) {
+    matches({ routes, location }){
         let req = this.parse(location);
         return this.doRoute(req, routes);
     }
@@ -56,7 +56,7 @@ class Hub {
      * @param path (String)
      * @return req | null (Object | null)
      */
-    parse(path) {
+    parse(path){
         let req = {};
         let [uri, queryString] = path.split('?');
         let prefix = null;
@@ -92,9 +92,9 @@ class Hub {
             }
         }
         return req;
-    } 
+    }
 
-    _parseRoute() {
+    _parseRoute(){
         route.parser(this.parse.bind(this));
         return this;     
     }
@@ -105,7 +105,7 @@ class Hub {
      * @param ctx (Object)
      * @param redirect (Boolean)
      */
-    routeTo(route, ctx, hint, redirect = false, level, cb) {
+    routeTo(route, ctx, hint, redirect = false, level, cb){
         this.busy = false;
         this.trigger('busy-resolve');
 
@@ -151,7 +151,7 @@ class Hub {
      * @param uri
      * @return lean req (Request | Boolean)
      */
-    match(rule, uri) {
+    match(rule, uri){
         let parts = Util.distinct(rule.split('/').map(r => Util.completePart(r)));
         let fragments = Util.distinct(uri.split('/').map(r => Util.completePart(r)));
         
@@ -195,7 +195,7 @@ class Hub {
      * @param node (Object) riot tag
      * @param recursive level
      */
-    recurMatch(ctx, node = {}, level, routes, components) {
+    recurMatch(ctx, node = {}, level, routes, components){
         let { req } = ctx;
         let { hints } = req;
         let hint = hints[level];
@@ -211,7 +211,7 @@ class Hub {
 
             if (matchRes) {
                 //assign object to context
-                if(!ctx.req.params){
+                if (!ctx.req.params) {
                     ctx.req.params = {};
                 }
                 Object.assign(ctx.req.params, matchRes);
@@ -249,15 +249,17 @@ class Hub {
             }
             function done(){
                 if (!target.tag || !target.tag.isMounted) {
-                    let outletEl = outlet.root.querySelector(`div[data-tag-name="${target.component.displayName}"]`);
-                    let tag = new target.component(outletEl);
+                    let outletEl = outlet.parent.root.querySelector(`div[data-tag="${target.component.displayName}"]`);
+                    let tag = new target.component(outletEl, {parent: outlet.parent});
+                    
                     if (tag) {
                         tag.$routePath = target.path;
-                        outlet.parent.tags[tag.opts.riotTag] = tag;
-                        tag.parent = outlet.parent;
+                        // outlet.parent.tags[tag.opts.riotTag] = tag;
+                        // tag.parent = outlet.parent;
                         target.tag = tag;
                     }
                 }
+                
                 if (target.tag) {
                     return this.routeTo(target, ctx, hint, false, level, () => {
                         if (hints[level + 1]) {
@@ -270,7 +272,7 @@ class Hub {
         }
     }
 
-    doRoute(req, routes) {
+    doRoute(req, routes){
         let me = this;
         if (!req) {
             return;
@@ -292,7 +294,7 @@ class Hub {
      * @param addons (Object)
      * @param cb (Function)
      */
-    routeToDone(data, ctx, {hints, req, route, tag, $state, $location, index}, cb) {
+    routeToDone(data, ctx, {hints, req, route, tag, $state, $location, index}, cb){
         let me = this;
         if (ctx && data) {
             !ctx.body && (ctx.body = {});
@@ -319,7 +321,7 @@ class Hub {
         let RAFId = requestAnimationFrame(done);
     }
 
-    routeSuccess(data, ctx, {hints, req, route, tag, $state, $location, index}, cb) {
+    routeSuccess(data, ctx, {hints, req, route, tag, $state, $location, index}, cb){
         let me = this;
         let from = me.getMetaDataFromRouteMap(me.location).route;
         let to = route;
@@ -351,7 +353,7 @@ class Hub {
      * @params url (String)
      * @return this
      */
-    go(url, title = null, replace) {
+    go(url, title = null, replace){
         if (!title && this.title) {
             title = this.title();
         }
@@ -359,14 +361,14 @@ class Hub {
         return this; 
     }
 
-    setTitle(fn) {
+    setTitle(fn){
         this.title = fn;
     }
 
     /**
      * @params routeKey (String)
      */
-    getMetaDataFromRouteMap(routeKey) {
+    getMetaDataFromRouteMap(routeKey){
         routeKey = routeKey && routeKey.startsWith('/') ? routeKey : '/' + routeKey;
         let keys = Object.keys(this.routes);
         for (let i=0, len=keys.length; i<len; i++) {
@@ -396,7 +398,7 @@ class Hub {
      * @params ctx (Object)
      * @params done (Function)
      */
-    executeMiddlewares(component, mws, ctx, done) {
+    executeMiddlewares(component, mws, ctx, done){
         let me = this;
         return function nextFn(){
             if(!mws || !mws.length){
@@ -406,7 +408,7 @@ class Hub {
         }
     }
 
-    search(param, value) {
+    search(param, value){
         this.trigger('state-search', {param, value})
         return this;
     }
@@ -414,84 +416,84 @@ class Hub {
     /**
      * getters and setters
      */
-    get view() {
+    get view(){
         return this._view;
     }
 
-    set view(val) {
+    set view(val){
         this._view = val;
     }
 
-    get root() {
+    get root(){
         return this._root;
     }
 
-    set root(v) {
+    set root(v){
         this._root = v;
     }
 
-    get prev() {
+    get prev(){
         return this._prev;
     }
 
-    set prev(v) {
+    set prev(v){
         this._prev = v;
     }
 
-    get busy() {
+    get busy(){
         return this._busy;
     }
 
-    set busy(val) {
+    set busy(val){
         this._busy = val;
     }
 
-    get title() {
+    get title(){
         return this._title;
     }
 
-    set title(val) {
+    set title(val){
         this._title = val;
     }
 
-    get routes() {
+    get routes(){
         return this._routes;
     }
 
-    set routes(val) {
+    set routes(val){
         this._routes = val;
         Util.flatAndComposePrefix(this.routes, this.refinedRoutes);
     }
 
-    get defaultRoute() {
+    get defaultRoute(){
         return this._defaultRoute;
     }
 
-    set defaultRoute(val) {
+    set defaultRoute(val){
         this._defaultRoute = val;
     }
 
-    get location() {
+    get location(){
         return this._location;
     }
 
-    set location(val) {
+    set location(val){
         this._location = val
     }
 
-    trigger(...args) {
+    trigger(...args){
         return this._emitter.trigger.apply(this._emitter, args);
     }
 
-    on(...args) {
+    on(...args){
         return this._emitter.on.apply(this._emitter, args);
     }
 
-    off(...args) {
+    off(...args){
         return this._emitter.off.apply(this._emitter, args);
     }
 
-    one(...args) {
+    one(...args){
         return this._emitter.one.apply(this._emitter, args);
     }
 }
@@ -513,7 +515,7 @@ class Util {
         if(!arr){
             return;
         }
-        for(var i=0, len=arr.length; i<len; i++){
+        for (var i=0, len=arr.length; i<len; i++) {
             let route = arr[i];
             route.path = (node.path || '') + route.path;
             route.parent = node.id || '';
@@ -523,7 +525,7 @@ class Util {
         }
     }
 
-    static genId(n) {
+    static genId(n){
         let chars = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
         let res = "";
         for(let i = 0; i < n ; i ++) {
@@ -580,7 +582,7 @@ class Util {
         if(!Array.isArray(ks) || !Array.isArray(vs) || ks.length != vs.length){
             return o;
         }
-        ks.forEach((k, index)=>{
+        ks.forEach((k, index) => {
             o[k] = vs[index]
         });
         return o;

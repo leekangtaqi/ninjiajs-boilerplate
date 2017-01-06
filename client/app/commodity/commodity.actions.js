@@ -10,6 +10,8 @@ const delay = () => new Promise((resolve, reject) => {
 
 const test = json => async (dispatch, getState) => {
 	await dispatch(delay());
+	// ....
+	await dispatch
 }
 
 const add = async json => async (dispatch, getState) => {

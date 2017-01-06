@@ -1,22 +1,22 @@
 class View {
-    setHandler(callback){
+    setHandler(callback) {
         this.handler = callback;
     }
 
-    enter(tag, from , callback){
-        if(!tag){
+    enter(tag, from , callback) {
+        if (!tag) {
             return;
         }
         tag.trigger('enter', from);
         tag.opts.show = true;
         tag.opts.hidden = false;
-        if(this.handler){
+        if (this.handler) {
             return this.handler('enter', tag);    
         }
         tag.update();
     }
 
-    leaveUpstream(tag){
+    leaveUpstream(tag) {
         if (!tag || !tag.parent || !tag.parent.tags || !tag.parent.tags['router-outlet']) {
             return;
         }
@@ -39,7 +39,7 @@ class View {
         return this.leaveUpstream(tag.parent);
     }
 
-    leaveDownstream(tag, parent){
+    leaveDownstream(tag, parent) {
         if (!tag) {
             return;
         }
@@ -49,7 +49,7 @@ class View {
             return;
         }
         let routes = outlet.routes;
-        if(!routes){
+        if (!routes) {
             return;
         }
         routes.map(r => r.tag).forEach(t => {
@@ -60,12 +60,12 @@ class View {
         })
     }
     
-    leave(tag, to, callback){
-        if(!tag){
+    leave(tag, to, callback) {
+        if (!tag) {
             return;
         }
         tag.trigger('leave', to); 
-        if(tag.opts.show || tag.opts.$show){
+        if (tag.opts.show || tag.opts.$show) {
             tag.opts.show = false;
             tag.opts.hidden = true;
             if(this.handler){
@@ -75,7 +75,7 @@ class View {
         }
     }
 
-    init(tag, name){
+    init(tag, name) {
         tag.opts.hidden = true;
         tag.opts.show = false;
     }

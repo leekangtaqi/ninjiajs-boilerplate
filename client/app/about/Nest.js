@@ -9,9 +9,6 @@ export default class Nest extends riot.Tag {
 	get tmpl() {
 		return `<div>nest</div>`
 	}
-	get attrs() {
-		return 'if="{ opts.$show }"'
-	}
 	onCreate(opts) {
 		this.mixin('router')
 		this.on('update', () => {

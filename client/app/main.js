@@ -10,6 +10,7 @@ import reducer from './registerReducers';
 import middlewares from './middlewares';
 import routes from './routes';
 import App from './App';
+import CommodityNest from './commodity/CommodityNest';
 
 if(process.env.NODE_ENV === 'development'){
     require('./main.scss');
@@ -29,10 +30,6 @@ app.set('env', process.env.NODE_ENV ? process.env.NODE_ENV : 'development');
 app.set('mode', 'browser');
 
 app.set('context', { store: app.store, hub: router.hub, tags: {}, util: {promisify, promisifyAll}});
-
-require('riot-form-mixin');
-
-app.mixin('form', form);
 
 router.hub.routes = routes;
 
