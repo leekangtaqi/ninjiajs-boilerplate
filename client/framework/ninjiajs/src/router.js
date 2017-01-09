@@ -226,7 +226,6 @@ class Hub {
                 this.routeTo(node.defaultRoute, ctx, hint, true, level);
                 return {ctx, components: components.concat(target)};
             }
-            console.info('404');
             this.busy = false;
             this.trigger('busy-resolve');
             return { ctx, components };
@@ -247,8 +246,10 @@ class Hub {
             } else {
                 done.apply(this)
             }
+
             function done(){
                 if (!target.tag || !target.tag.isMounted) {
+
                     let outletEl = outlet.parent.root.querySelector(`div[data-tag="${target.component.displayName}"]`);
                     let tag = new target.component(outletEl, {parent: outlet.parent});
                     

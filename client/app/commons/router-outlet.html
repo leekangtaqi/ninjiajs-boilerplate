@@ -1,11 +1,19 @@
 <router-outlet>
+
 	<div data-tag="{ route.component.displayName }" each="{ route in distinct(routes) }"></div>
 
 	<script>
-
 		this.$isMounted = false;
 
+		this.on('unmount', () => {
+			this.$isMounted = false;
+			this.routes.forEach(r => {
+				r.tag && r.tag.unmount();
+			})
+		})
+		
 		this.on('mount', () => {
+			this.$isMounted = false;
 			this.routes = [];
 			if (!app.hub.state.hint) {
 				this.routes = app.hub.routes.children;

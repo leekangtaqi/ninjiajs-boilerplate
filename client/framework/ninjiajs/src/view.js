@@ -43,6 +43,7 @@ class View {
         if (!tag) {
             return;
         }
+
         this.leave(tag, parent);
         let outlet = tag.tags['router-outlet'];
         if(!outlet){

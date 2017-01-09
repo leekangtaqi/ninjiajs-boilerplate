@@ -7,10 +7,18 @@ export default class CommodityNest extends riot.Tag {
 	get name() {
 		return 'commodity-nest'
 	}
-	onCreate(){
-
+	get attrs() {
+		return 'if="{true}"'
+	}
+	onCreate() {
+		this.on('mount', () => {
+			
+		})
 	}
 	get tmpl() {
-		return `<div>commodity nest</div>`
+		return `
+			<div>commodity nest grating!
+				<input onclick="{click}">
+			</div>`
 	}
 }

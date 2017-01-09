@@ -16,7 +16,6 @@ export default class About extends riot.Tag {
 			<div>end about</div>
 			<a href="/about/nest">jump to nest</a>
 			<router-outlet></router-outlet>
-			<div ref="test"></div>
 		`
 	}
 

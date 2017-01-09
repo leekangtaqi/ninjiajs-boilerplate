@@ -20,6 +20,6 @@
 	<span>{ c.name }</span>
 </div>
 
-<virtual data-is="commodity-nest"></virtual>
+<commodity-nest></commodity-nest>
 
 <div>CommodityList end</div>

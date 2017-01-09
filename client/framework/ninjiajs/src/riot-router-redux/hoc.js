@@ -57,8 +57,14 @@ export default function view(WrappedComponent) {
 				return _.camelToLine(super.name);
 			}
 
-			get attrs() {
-				return 'show="{ opts.$show }"'
+			// get attrs() {
+			// 	return "show='{opts.$show}'"
+			// }
+
+			get tmpl() {
+				return `
+					<div if="{opts.$show}">${super.tmpl}</div>
+				`
 			}
 
 			onCreate(opts) {

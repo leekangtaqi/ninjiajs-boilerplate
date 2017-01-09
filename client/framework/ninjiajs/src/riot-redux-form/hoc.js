@@ -13,11 +13,21 @@ export default function form(inputRulePairs) {
 				return 'form-' + (super.name || WrappedComponent.name);
 			}
 			onCreate(opts) {
+				
 				super.onCreate(opts);
 				this.options = inputRulePairs;
+				this.on('mount', this.onMount);
 				this.on('updated', this.onUpdated);
 				this.on('unmount', this.onUnmount);
 				this.mapDispatchToOpts();
+			}
+
+			onMount() {
+				//
+			}
+
+			onUnmount() {
+				
 			}
 
 			mapDispatchToOpts() {

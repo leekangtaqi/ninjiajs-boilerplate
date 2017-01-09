@@ -12,7 +12,10 @@ export default class Nest extends riot.Tag {
 	onCreate(opts) {
 		this.mixin('router')
 		this.on('update', () => {
-			console.warn("about updated");
+			console.warn(">>>>>>>>>>>>>>");
+			console.warn(this);
+			console.warn(this.opts.$show);
+			console.warn("nest updated");
 		})
 		this.message = opts.message
 	}

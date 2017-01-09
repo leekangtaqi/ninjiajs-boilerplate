@@ -1,5 +1,16 @@
 import * as riot from 'riot';
 
+function extractPrototypes(s) {
+	let o = {};
+	let excludes = ['tmpl', 'css', 'attrs'];
+	for (let p in s) {
+		if (excludes.indexOf(s[p]) < 0) {
+			o[p] = s[p]
+		}
+	}
+	return o;
+}
+
 export default function register(WrappedComponent) {
 
 	if (!WrappedComponent.originName) {
@@ -10,12 +21,15 @@ export default function register(WrappedComponent) {
 		throw new Error(`register decorator expected a template.`)
 	}
 
-	let tag = riot.tag(
+	riot.tag(
 		WrappedComponent.originName,
 		WrappedComponent.prototype.tmpl,
 		WrappedComponent.prototype.css || '',
 		WrappedComponent.prototype.attrs || '',
-		WrappedComponent.prototype.onCreate || function noop(){}
+		function componentConstructor(opts) {
+			this.mixin(extractPrototypes(WrappedComponent.prototype))
+			this.onCreate.apply(this, [opts]);
+		}
 	)
 	
 	return WrappedComponent;
