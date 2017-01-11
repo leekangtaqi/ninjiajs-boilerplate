@@ -16,9 +16,7 @@ export default function form(inputRulePairs) {
 				super.onCreate(opts);
 				this.options = inputRulePairs;
 				this.on('updated', this.onUpdated);
-				this.$use(this.onUseForm)
 				this.mapDispatchToOpts();
-				this.on('before-leave', this.onLeaveForm);
 			}
 
 			/**
@@ -27,7 +25,7 @@ export default function form(inputRulePairs) {
 			 * trigger onUpdated event, init the whole forms.
 			 */
 			resetForm() {
-				// todo
+				
 			}
 
 			mapDispatchToOpts() {
