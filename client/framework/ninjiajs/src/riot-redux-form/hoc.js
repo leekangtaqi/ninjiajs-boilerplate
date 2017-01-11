@@ -27,22 +27,7 @@ export default function form(inputRulePairs) {
 			 * trigger onUpdated event, init the whole forms.
 			 */
 			resetForm() {
-				
-			}
-
-			/**
-			 * save the snapshot of all inputs.
-			 * collect all handlers of input to rebind when page entered.
-			 */
-			onLeaveForm() {
-				console.warn(this.refs);
-			}
-
-			/**
-			 * restore the 
-			 */
-			onUseForm(next) {
-				next();
+				// todo
 			}
 
 			mapDispatchToOpts() {
