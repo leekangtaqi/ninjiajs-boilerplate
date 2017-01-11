@@ -1,6 +1,6 @@
 {
   "name": "ninjiajs-boilerplate",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "main": "server/app.js",
   "dependencies": {
     "ali-oss": "^4.4.4",

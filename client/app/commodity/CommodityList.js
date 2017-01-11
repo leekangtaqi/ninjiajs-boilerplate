@@ -38,11 +38,8 @@ export default class CommodityList extends riot.Tag {
 		this.mixin('router')
 		this.message = opts.message = 'hello?'
 		this.on('mount', this.onMount)
+		this.on('unmount', this.onUnmount)
 		this.$use(this.onUse)
-	}
-
-	onMount() {
-		
 	}
 
 	async onUse(next) {

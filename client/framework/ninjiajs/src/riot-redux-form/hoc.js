@@ -13,21 +13,36 @@ export default function form(inputRulePairs) {
 				return 'form-' + (super.name || WrappedComponent.name);
 			}
 			onCreate(opts) {
-				
 				super.onCreate(opts);
 				this.options = inputRulePairs;
-				this.on('mount', this.onMount);
 				this.on('updated', this.onUpdated);
-				this.on('unmount', this.onUnmount);
+				this.$use(this.onUseForm)
 				this.mapDispatchToOpts();
+				this.on('before-leave', this.onLeaveForm);
 			}
 
-			onMount() {
-				//
-			}
-
-			onUnmount() {
+			/**
+			 * del all forms and inputs.
+			 * unbind any event listener and reflush redux store.
+			 * trigger onUpdated event, init the whole forms.
+			 */
+			resetForm() {
 				
+			}
+
+			/**
+			 * save the snapshot of all inputs.
+			 * collect all handlers of input to rebind when page entered.
+			 */
+			onLeaveForm() {
+				console.warn(this.refs);
+			}
+
+			/**
+			 * restore the 
+			 */
+			onUseForm(next) {
+				next();
 			}
 
 			mapDispatchToOpts() {
@@ -59,7 +74,9 @@ export default function form(inputRulePairs) {
 			 * when updated, check input modify or not, if it is, set rule again.
 			 */
 			onUpdated() {
+				
 				let store = this.getStore();
+			
 				if (!this.refs) {
 					return;
 				}
@@ -70,6 +87,30 @@ export default function form(inputRulePairs) {
 				// the forms struct changed ?
 				this.refDiff(this.extractFormsFromRef());
 				
+				// rebind or not
+				this.rebindInputs();
+			}
+
+			rebindInputs() {
+				for (let inputName in this.refs) {
+					let handler = this.findHandlerInFormHandlersByInputName(inputName);
+					let input = this.refs[inputName]
+					if (handler && handler.input != input) {
+						handler.input = input
+						input.addEventListener('change', handler.bind(this))
+					}
+				}
+			}
+
+			findHandlerInFormHandlersByInputName(inputName) {
+				if (!this.$form || !this.$form.handlers) {
+					return;
+				}
+				for (let handler of this.$form.handlers) {
+					if (handler.input.getAttribute('ref') === inputName) {
+						return handler;
+					}
+				}
 			}
 
 			extractFormNamesFromRef() {
@@ -248,6 +289,8 @@ export default function form(inputRulePairs) {
 						inputToUpdate = this.inputInvalid(input, inputJson, ruleName, val)
 					}
 
+					inputToUpdate.$val = val;
+
 					this.resolveClass(inputJson, input)
 					
 					inputsToUpdate.push(inputToUpdate);
@@ -403,8 +446,10 @@ export default function form(inputRulePairs) {
 						this.extractFormNamesFromRef().indexOf(lastAction.payload) >= 0
 						)
 					) {
-						this.opts.forms = state.forms
-						this.update();
+						if (this.opts.$show) {
+							this.opts.forms = state.forms
+							this.update();
+						}
 					}
 				})
 			}
