@@ -35,7 +35,7 @@
     "redux": "^3.5.2",
     "redux-actions": "^1.2.0",
     "request": "^2.57.0",
-    "riot": "^3.0.5",
+    "riot": "^3.0.7",
     "riot-form-mixin": "^2.2.1",
     "riot-mixin-pack": "^0.1.7",
     "serve-favicon": "~2.0.1",
