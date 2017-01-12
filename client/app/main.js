@@ -41,6 +41,8 @@ router.hub.view.setHandler(function handler(direction, tag){
 
 app.router(router);
 
+riot.util.tmpl.errorHandler = e => {}
+
 /**
  * application ready callback.
  */
