@@ -25,7 +25,66 @@ export default function form(inputRulePairs) {
 			 * trigger onUpdated event, init the whole forms.
 			 */
 			resetForm() {
-				
+				let formsToRemove = []
+				this.extractFormNamesFromRef().forEach(formName => {
+					this.delForm(formName)
+					formsToRemove.push({form: formName})
+				})
+				let store = this.getStore();
+				store.dispatch({type: 'forms/remove', payload: formsToRemove});
+			}
+
+			/**
+			 * @param inputNames <Array>
+			 */
+			resetInputs(inputNames) {
+				inputNames.forEach(inputName => this.resetInput(inputName));
+			}
+
+			/**
+			 * @param inputName <String>
+			 * @param val <String>
+			 */
+			setRef(inputName, val='') {
+				if (!inputName) {
+					let err = new Error(`set ref method expecta input name`);
+					throw err;
+				}
+				this.refs[inputName].value = val;
+				triggerEvent(this.refs[inputName], 'change')
+				function triggerEvent(el, type){
+					if ('createEvent' in document) {
+						// modern browsers, IE9+
+						var e = document.createEvent('HTMLEvents');
+						e.initEvent(type, false, true);
+						el.dispatchEvent(e);
+					} else {
+						// IE 8
+						var e = document.createEventObject();
+						e.eventType = type;
+						el.fireEvent('on'+e.eventType, e);
+					}
+				}
+			}
+
+			/**
+			 * unbind change listener, remove handler from this.$form
+			 * remove input of store
+			 * @param inputName <String>
+			 */
+			resetInput(inputName) {
+				if (!inputName) {
+					let err = new Error(`[redux-form]: reset input expect a inputName`);
+					throw err;
+				}
+				if (!this.refs[inputName] || 
+					!this.refs[inputName].form || 
+					!this.refs[inputName].form.getAttribute('ref')
+				) {
+					return;
+				}
+				let formName = this.refs[inputName].form.getAttribute('ref');
+				this.delInput(inputName, formName);
 			}
 
 			mapDispatchToOpts() {
@@ -150,7 +209,6 @@ export default function form(inputRulePairs) {
 
 					dels.forEach(f => {
 						this.delForm(store, f)
-						this.getInputs(this.refs[f]).forEach(i => this.delInput(i));
 						formsToRemove.push({ form: f })
 					})
 
@@ -164,10 +222,9 @@ export default function form(inputRulePairs) {
 					if (adds && adds.length) {
 						let formsToUpdate = [];
 
-						adds.forEach((formName, inputs) => {
-
+						adds.forEach(({formName, inputs}) => {
 							if (inputs && inputs.length) {
-								let inputsToUpdate = inputs.map(input => this.addInput(store, this.refs[input], f));
+								let inputsToUpdate = inputs.map(input => this.addInput(store, this.refs[input], formName));
 								formsToUpdate.push({ form: formName, inputs: inputsToUpdate })
 							}
 						})
@@ -247,16 +304,32 @@ export default function form(inputRulePairs) {
 				input.addEventListener('change', handler.bind(this))
 			}
 
+			/**
+			 * @param input <Element>
+			 * @return <null>
+			 */
 			unbindInputChange(input) {
+				if (!this.$form.handlers.length) {
+					return;
+				}
 				let handlers = this.$form.handlers.filter(h => h.input === input);
-				input.removeEventListeners(handlers);
+				this.$form.handlers = this.$form.handlers.filter(h => h.input != input);
+				if (handlers.length) {
+					handlers.forEach((h, i) => {
+						input.removeEventListener('change', h);
+					})
+				}
 			}
 
+			/**
+			 * @param input <Element>
+			 * @param val <String> value to validate
+			 */
 			validate(input, val) {
 				let store = this.getStore()
-				let formName = input.form.attributes['ref'].value;
+				let formName = input.form.getAttribute('ref');
 				let form = store.getState().forms[formName];
-				let inputJson = form[input.attributes['ref'].value];
+				let inputJson = form[input.getAttribute('ref')];
 				let rules = inputJson.$rule;
 				let inputsToUpdate = [];
 
@@ -347,6 +420,11 @@ export default function form(inputRulePairs) {
 				}
 			}
 
+			/**
+			 * @param store <Object>
+			 * @param input <Element>
+			 * @param formName <String>
+			 */
 			addInput(store, input, formName) {
 				let inputName = this.getInputName(input);
 				let rulesMap = this.options[inputName];
@@ -388,7 +466,13 @@ export default function form(inputRulePairs) {
 			}
 
 			delInput(inputName, formName) {
-				this.unbindInputChange(this.refs[inputName])
+				let formsToRemove = [];
+				let store = this.getStore();
+				let inputEl = this.refs[inputName];
+				inputEl.value = ""
+				this.unbindInputChange(inputEl)
+				formsToRemove.push({ form: formName,  inputs: [inputName]})
+				store.dispatch({type: 'forms/inputs/remove', payload: formsToRemove});
 			}
 
 			addForm(store, formName) {
@@ -410,9 +494,12 @@ export default function form(inputRulePairs) {
 			}
 
 			delForm(formName) {
-				this.extractInputsFromForm(this.refs[formName]).map(n => this.refs[n]).forEach(input => {
-					this.unbindInputChange(input)
-				})
+				this.extractInputsFromForm(this.refs[formName])
+					.map(n => this.refs[n])
+					.forEach(input => {
+						input.value = ''
+						this.unbindInputChange(input)
+					})
 			}
 
 			trySubscribe() {
@@ -426,8 +513,8 @@ export default function form(inputRulePairs) {
 						(lastAction.type === 'forms/inputs/update' && 
 						this.extractFormNamesFromRef().indexOf(lastAction.payload.form) >= 0) ||
 						(lastAction.type === 'form/submit' && 
-						this.extractFormNamesFromRef().indexOf(lastAction.payload) >= 0
-						)
+						this.extractFormNamesFromRef().indexOf(lastAction.payload) >= 0) ||
+						this.concernActions(lastAction.type, lastAction.payload)
 					) {
 						if (this.opts.$show) {
 							this.opts.forms = state.forms
@@ -435,6 +522,23 @@ export default function form(inputRulePairs) {
 						}
 					}
 				})
+			}
+
+			concernActions(type, payload) {
+				let formNames = this.extractFormNamesFromRef();
+				if (type === 'forms/remove') {
+					if (formNames && formNames.length) {
+						let intersection =  _.intersect(formNames, payload.map(p => p.form))
+						return intersection.length > 0;
+					}
+				}
+				if (type === 'forms/inputs/remove') {
+					let inputNames = payload.map(s => s.inputs).reduce((acc, curr) => acc.concat(curr), []);
+					if (inputNames) {
+						return _.intersect(inputNames, Object.keys(this.refs)).length > 0
+					}
+				}
+				return false;
 			}
 
 			unSubscribe() {

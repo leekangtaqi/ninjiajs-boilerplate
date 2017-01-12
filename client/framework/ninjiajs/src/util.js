@@ -6,6 +6,16 @@ const mixin = (...args) => {
     return Object.assign(...args)
 }
 
+const intersect = (arr1, arr2) => {
+    let res = [];
+    for (let i=0, len=arr1.length; i<len; i++) {
+        if (arr2.indexOf(arr1[i]) >= 0) {
+            res.push(arr1[i])
+        }
+    }
+    return res;
+}
+
 const pick = (o, ...fs) =>
     Object.keys(o)
         .filter(f => fs.indexOf(f) >= 0)
@@ -189,5 +199,6 @@ export default {
     extractField,
     hasClass,
     addClass,
-    removeClass
+    removeClass,
+    intersect
 }

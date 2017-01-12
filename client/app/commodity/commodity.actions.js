@@ -5,13 +5,13 @@ const update = json => ({type: 'commodity/update', payload: json});
 const delay = () => new Promise((resolve, reject) => {
 	setTimeout(() => {
 		resolve({type: 'xxx', payload: '222'})
-	}, 100)
+	}, 1000)
 })
 
 const test = json => async (dispatch, getState) => {
 	await dispatch(delay());
 	// ....
-	await dispatch
+	
 }
 
 const add = async json => async (dispatch, getState) => {

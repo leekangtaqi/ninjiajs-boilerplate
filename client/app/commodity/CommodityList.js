@@ -45,11 +45,17 @@ export default class CommodityList extends riot.Tag {
 	async onUse(next) {
 		next();
 		await this.opts.actions.update({id: 1, name: '333'}); 
-		let res = await this.opts.actions.add({id: 2, name: '新品'}); 
+		let res = await this.opts.actions.add({id: 2, name: '新品'});
 	}
 	
 	click() {
 		this.message = 'goodbye'
+		this.resetForm();
+		console.warn("reseted ..........");
+	}
+
+	resetUsername() {
+		this.setRef('username')
 	}
 
 	async onSubmit(e) {
